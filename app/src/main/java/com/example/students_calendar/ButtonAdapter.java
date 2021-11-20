@@ -40,8 +40,7 @@ public class ButtonAdapter extends ArrayAdapter<ButtonProperties> {
             public void onClick(View view) {
                 Button sender = (Button)view;
                 Intent intent = new Intent(mContext, OpenedTab.class);
-
-                intent.putExtra("dayNumber", Integer.getInteger(sender.getText().toString()));
+                intent.putExtra("dayNumber", Integer.decode(sender.getText().toString()));
                 //intent.putExtra("dayOfWeek", props)
 
                 mContext.startActivity(intent);

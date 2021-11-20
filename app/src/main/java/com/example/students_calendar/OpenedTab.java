@@ -14,7 +14,8 @@ public class OpenedTab extends AppCompatActivity {
 
         TextView a = findViewById(R.id.textView);
         Bundle arguments = getIntent().getExtras();
-        String name = arguments.get("value").toString();
+        Object obj = arguments.get("dayNumber");
+        String name = obj.toString();
         a.setText(name);
     }
 }

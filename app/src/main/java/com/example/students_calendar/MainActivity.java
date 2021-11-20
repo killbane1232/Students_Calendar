@@ -4,22 +4,41 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.icu.util.Calendar;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.GridView;
 
 public class MainActivity extends AppCompatActivity {
     Bundle savedInstance;
-
+    protected String monthToString(int month) {
+        switch (month)
+        {
+            case 1: return "January";
+            case 2: return "February";
+            case 3: return "March";
+            case 4: return "April";
+            case 5: return "May";
+            case 6: return "June";
+            case 7: return "July";
+            case 8: return "August";
+            case 9: return "September";
+            case 10: return "October";
+            case 11: return "November";
+            case 12: return "December";
+            default: return "";
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         savedInstance = savedInstanceState;
         setContentView(R.layout.activity_main);
-        
+        Button middle = findViewById(R.id.middleHeaderButton);
         GridView dataGrid = findViewById(R.id.dataGrid);
         dataGrid.setNumColumns(7);
 
         int daysInMonth;
         int month=Calendar.getInstance().get(Calendar.MONTH)+1;
+        middle.setText(monthToString(month));
         if(month>6)
             if(month%2==0)
                 daysInMonth=31;
