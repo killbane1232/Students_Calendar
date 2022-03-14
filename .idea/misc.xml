@@ -3,21 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Students_Calendar/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
-        <entry key="..\:/Students_Calendar/app/src/main/res/drawable/button_shape.xml" value="0.1" />
-        <entry key="..\:/Students_Calendar/app/src/main/res/drawable/colors.xml" value="0.18552631578947368" />
-        <entry key="..\:/Students_Calendar/app/src/main/res/drawable/ic_launcher_background.xml" value="0.18552631578947368" />
-        <entry key="..\:/Students_Calendar/app/src/main/res/drawable/table_button.xml" value="0.1" />
-        <entry key="..\:/Students_Calendar/app/src/main/res/layout/activity_main.xml" value="0.1" />
-        <entry key="..\:/Students_Calendar/app/src/main/res/layout/activity_opened_tab.xml" value="0.25" />
-        <entry key="..\:/Students_Calendar/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
-        <entry key="..\:/Students_Calendar/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2109375" />
-        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2109375" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/activity_opened_tab.xml" value="0.16485507246376813" />
-        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2109375" />
-        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2109375" />
+        <entry key="..\:/Git/Students_Calendar/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Git/Students_Calendar/app/src/main/res/layout/calendar_cell.xml" value="0.2703804347826087" />
+        <entry key="..\:/Users/killbane/AndroidStudioProjects/Students_Calendar/app/src/main/res/layout/activity_main.xml" value="0.3484375" />
       </map>
     </option>
   </component>
