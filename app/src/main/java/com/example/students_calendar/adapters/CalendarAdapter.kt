@@ -1,8 +1,10 @@
-package com.example.students_calendar
+package com.example.students_calendar.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.students_calendar.holders.CalendarViewHolder
+import com.example.students_calendar.R
 import java.util.*
 
 class CalendarAdapter : RecyclerView.Adapter<CalendarViewHolder> {
@@ -26,11 +28,9 @@ class CalendarAdapter : RecyclerView.Adapter<CalendarViewHolder> {
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
         holder.dayOfMonthText.setText(daysOfMoth.get(position))
-        //TODO("Not yet implemented")
     }
 
     override fun getItemCount(): Int {
-        //TODO("Not yet implemented")
         return daysOfMoth.size
     }
 
