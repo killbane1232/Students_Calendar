@@ -3,37 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/NoteName"
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/NoteNameInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/NoteDescription"
+        android:hint="Name"
+        android:inputType="text"
+        app:layout_constraintBottom_toTopOf="@+id/NoteDescriptionInput"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/checkBox"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <CheckBox
         android:id="@+id/checkBox"
         android:layout_width="46dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/NoteDescription"
-        app:layout_constraintEnd_toStartOf="@+id/NoteName"
+        app:layout_constraintBottom_toBottomOf="@+id/NoteDescriptionInput"
+        app:layout_constraintEnd_toStartOf="@+id/NoteNameInput"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/NoteName" />
+        app:layout_constraintTop_toTopOf="@+id/NoteNameInput" />
 
-    <TextView
-        android:id="@+id/NoteDescription"
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/NoteDescriptionInput"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text=""
+        android:hint="Description"
+        android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/checkBox"
-        app:layout_constraintTop_toBottomOf="@+id/NoteName"
+        app:layout_constraintTop_toBottomOf="@+id/NoteNameInput"
         tools:ignore="HardcodedText" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Build
 import android.os.Bundle;
 import android.view.View
+import android.widget.Button
 import android.widget.TextView;
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -52,8 +53,10 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener {
         val index = pair.second
 
 
-        val adapter = CalendarAdapter(array,this)
+        val adapter = CalendarAdapter(array,this, this)
         val layoutManger = GridLayoutManager(applicationContext,7)
+        //var decor = RecyclerView.ItemDecoration()
+        //calendarView.addItemDecoration()
         calendarView.layoutManager = layoutManger
         calendarView.adapter = adapter
     }
@@ -66,6 +69,7 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener {
         val firstOfMonth = selectedDate.withDayOfMonth(1)
         val dayOfWeek = firstOfMonth.dayOfWeek.value-1
         var dateToday = -1
+        var localDateNow = LocalDate.now()
 
         for(i in 1..42)
         {
@@ -73,9 +77,12 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener {
                 days.add("")
             else
             {
-                if(LocalDate.now().monthValue==selectedDate.monthValue && LocalDate.now().year==selectedDate.year&&i-dayOfWeek==LocalDate.now().dayOfMonth)
+                if(localDateNow.monthValue==selectedDate.monthValue && localDateNow.year==selectedDate.year&&i-dayOfWeek==localDateNow.dayOfMonth)
                     dateToday=i-1
-                days.add((i-dayOfWeek).toString())
+                if(localDateNow.year == selectedDate.year&&localDateNow.month == selectedDate.month && localDateNow.dayOfMonth==i-dayOfWeek)
+                    days.add("%"+(i-dayOfWeek).toString())
+                else
+                    days.add((i-dayOfWeek).toString())
             }
         }
         return Pair(days,dateToday)
@@ -89,9 +96,8 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener {
     }
 
     private fun initWidgets() {
-        calendarView = findViewById(R.id.calendarRecyclerView)
+        calendarView = findViewById(R.id.notesListView)
         monthText = findViewById(R.id.monthTV)
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

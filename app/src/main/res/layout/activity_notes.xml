@@ -51,11 +51,20 @@
         android:layout_height="wrap_content"
         android:background="@android:drawable/btn_dropdown"
         android:spinnerMode="dropdown"/>
-    <ListView
-        android:id="@+id/calendarRecyclerView"
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notesListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/addNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="addNoteAction"
+        android:text="+" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

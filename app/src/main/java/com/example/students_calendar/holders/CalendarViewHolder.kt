@@ -11,10 +11,12 @@ import com.example.students_calendar.adapters.CalendarAdapter
 public class CalendarViewHolder : RecyclerView.ViewHolder, View.OnClickListener {
 
     var dayOfMonthText:TextView;
+    var ItemView:View
     val onItemListener: CalendarAdapter.OnItemListener
 
     constructor(@NonNull itemView: View, onItemListener: CalendarAdapter.OnItemListener) : super(itemView) {
-        dayOfMonthText = itemView.findViewById(R.id.cellDayTV);
+        dayOfMonthText = itemView.findViewById(R.id.cellDayTV)
+        ItemView = itemView
         this.onItemListener = onItemListener
         itemView.setOnClickListener(this)
     }

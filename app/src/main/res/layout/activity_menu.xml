@@ -10,7 +10,7 @@
     app:layout_constraintTop_toTopOf="parent"
     tools:context=".activities.MenuActivity">
     <ListView
-        android:id="@+id/calendarRecyclerView"
+        android:id="@+id/notesListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"/>
