@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/NoteNameInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:inputType="text"
+        app:layout_constraintBottom_toTopOf="@+id/NoteDescriptionInput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/checkBox"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="46dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/NoteDescriptionInput"
+        app:layout_constraintEnd_toStartOf="@+id/NoteNameInput"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/NoteNameInput" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/NoteDescriptionInput"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Description"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/checkBox"
+        app:layout_constraintTop_toBottomOf="@+id/NoteNameInput"
+        tools:ignore="HardcodedText" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/beginDateText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="date"
+        android:hint="Дата начала"
+        app:layout_constraintTop_toBottomOf="@id/checkBoxDate"
+        app:layout_constraintBottom_toTopOf="@+id/endDateText"
+        app:layout_constraintEnd_toEndOf="@+id/checkBoxDate"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/endDateText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="date"
+        android:hint="Дата конца"
+        app:layout_constraintTop_toBottomOf="@id/beginDateText"
+        app:layout_constraintBottom_toTopOf="@+id/checkBoxPeriodic"
+        app:layout_constraintEnd_toEndOf="@+id/checkBoxDate"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/periodDateText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:inputType="date"
+        android:hint="Период год,месяц,день"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/periodTimeText"
+        app:layout_constraintTop_toBottomOf="@id/checkBoxPeriodic"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/beginTimeText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="Время начала"
+        android:inputType="time"
+        app:layout_constraintBottom_toTopOf="@+id/endTimeText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/checkBoxTime"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxTime" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/endTimeText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="Время конца"
+        android:inputType="time"
+        app:layout_constraintBottom_toTopOf="@+id/checkBoxPeriodic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/checkBoxTime"
+        app:layout_constraintTop_toBottomOf="@+id/beginTimeText" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/periodTimeText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="Период час,минута"
+        android:inputType="time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/periodDateText"
+        app:layout_constraintTop_toBottomOf="@id/checkBoxPeriodic"
+        app:layout_constraintBottom_toBottomOf="@id/periodDateText"/>
+
+    <CheckBox
+        android:id="@+id/checkBoxDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Есть ли привязка к дате"
+        app:layout_constraintEnd_toStartOf="@+id/checkBoxTime"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/NoteDescriptionInput" />
+
+    <CheckBox
+        android:id="@+id/checkBoxTime"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Есть ли привязка ко времени"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/checkBoxDate"
+        app:layout_constraintTop_toBottomOf="@+id/NoteDescriptionInput" />
+
+    <CheckBox
+        android:id="@+id/checkBoxPeriodic"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Событие периодическое?"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/endDateText" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,4 +3,5 @@
     <string name="next"><![CDATA[->]]></string>
     <string name="prev"><![CDATA[<-]]></string>
     <string name="node_create">Введите данные заметки</string>
+    <string name="notes_file">notes.json</string>
 </resources>

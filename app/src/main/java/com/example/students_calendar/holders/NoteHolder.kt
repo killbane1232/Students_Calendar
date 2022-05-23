@@ -9,13 +9,13 @@ import com.example.students_calendar.adapters.CalendarAdapter
 import com.example.students_calendar.adapters.NoteAdapter
 
 class NoteHolder : RecyclerView.ViewHolder, View.OnClickListener {
-    var noteNameText: TextView;
-    var noteDescriptionText: TextView;
+    var noteNameText: TextView
+    var noteDescriptionText: TextView
     val onItemListener: NoteAdapter.OnItemListener
 
     constructor(@NonNull itemView: View, onItemListener: NoteAdapter.OnItemListener) : super(itemView) {
-        noteNameText = itemView.findViewById(R.id.NoteName);
-        noteDescriptionText = itemView.findViewById(R.id.NoteDescription);
+        noteNameText = itemView.findViewById(R.id.NoteName)
+        noteDescriptionText = itemView.findViewById(R.id.NoteDescription)
         this.onItemListener = onItemListener
         itemView.setOnClickListener(this)
     }
@@ -23,6 +23,7 @@ class NoteHolder : RecyclerView.ViewHolder, View.OnClickListener {
     @Override
     override fun onClick(view: View)
     {
-        onItemListener.onItemClick(adapterPosition, noteNameText.text.toString())
+
+        onItemListener.onItemClick(adapterPosition)
     }
 }

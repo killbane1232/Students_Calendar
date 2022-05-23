@@ -1,29 +1,49 @@
-package com.example.students_calendar.activities;
+package com.example.students_calendar.activities
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 
 import android.os.Build
-import android.os.Bundle;
+import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.TextView;
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.students_calendar.R
 import com.example.students_calendar.adapters.CalendarAdapter
+import com.example.students_calendar.adapters.NoteAdapter
+import com.example.students_calendar.data.Note
+import com.example.students_calendar.data.NoteState
+import com.google.android.material.textfield.TextInputEditText
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import ru.tinkoff.decoro.MaskImpl
+import ru.tinkoff.decoro.parser.UnderscoreDigitSlotsParser
+import ru.tinkoff.decoro.watchers.FormatWatcher
+import ru.tinkoff.decoro.watchers.MaskFormatWatcher
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.lang.reflect.Type
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener {
+class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAdapter.OnItemListener {
     private lateinit var monthText:TextView
     private lateinit var calendarView:RecyclerView
     private lateinit var selectedDate:LocalDate
+
+    private lateinit var FILE_NAME:String
 
     companion object {
         fun getInstance(
@@ -38,7 +58,7 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initWidgets();
+        initWidgets()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             selectedDate = LocalDate.now()
         }
@@ -47,7 +67,7 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setMonthView() {
-        monthText.setText(monthFromDate(selectedDate));
+        monthText.text = monthFromDate(selectedDate)
         val pair = daysInMonthArray(selectedDate)
         val array = pair.first
         val index = pair.second
@@ -96,17 +116,57 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener {
     }
 
     private fun initWidgets() {
+        FILE_NAME=resources.getString(R.string.notes_file)
         calendarView = findViewById(R.id.notesListView)
         monthText = findViewById(R.id.monthTV)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onItemClick(position: Int, dayText: String) {
-        if(!dayText.equals(""))
-        {
-            val message = "Selected Date " + dayText + " " + monthFromDate(selectedDate)
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        if(dayText.equals(""))
+            return
+            var NotesList = listOf<Note>()
+            var fis: FileInputStream? = null
+            try {
+                fis = openFileInput(FILE_NAME)
+                val listType: Type = object : TypeToken<ArrayList<Note>>() {}.type
+                NotesList = Gson().fromJson(fis.reader(), listType)
+            } catch (ex: Exception) {
+                Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
+            } finally {
+                try {
+                    fis?.close()
+                } catch (ex: IOException) {
+                    Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        val DayClicked:LocalDate
+        val dayOfMonth = dayText.toInt()
+        var daysDif = (selectedDate.dayOfMonth-dayOfMonth).toLong()
+        if(selectedDate.dayOfMonth>dayOfMonth)
+            DayClicked = selectedDate.minusDays(daysDif)
+        else
+            DayClicked = selectedDate.plusDays(-daysDif)
+        val filterResult = NotesList.filter { x ->
+            x.StartDate!=null && x.StartDate!!.isBefore(DayClicked) &&  x.EndDate!=null && x.EndDate!!.isAfter(DayClicked
+            )
         }
+
+        val customView = layoutInflater.inflate(R.layout.dialog_calendar_notes, null)
+        val notesList = customView.findViewById<RecyclerView>(R.id.notesListView)
+        val layoutManger = LinearLayoutManager(applicationContext)
+        notesList.layoutManager = layoutManger
+        val listToUse = mutableListOf<Note>()
+        listToUse.addAll(filterResult)
+        val adapter = NoteAdapter(listToUse,this)
+        notesList.adapter = adapter
+        AlertDialog.Builder(this)
+            .setTitle(R.string.node_create)
+            .setView(customView)
+            .setCancelable(false)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                Toast.makeText(this,"УРА", Toast.LENGTH_LONG)
+            }.show()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -125,4 +185,8 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener {
         this.startActivity(NotesActivity.getInstance(this))}
     fun menuAction(view: View) {
         this.startActivity(MenuActivity.getInstance(this))}
+
+    override fun onItemClick(position: Int) {
+        TODO("Not yet implemented")
+    }
 }

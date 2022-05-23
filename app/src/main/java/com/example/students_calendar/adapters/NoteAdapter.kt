@@ -15,9 +15,9 @@ import com.example.students_calendar.holders.NoteHolder
 
 class NoteAdapter : RecyclerView.Adapter<NoteHolder> {
     var NotesList:MutableList<Note>
-    private val listener : NoteAdapter.OnItemListener
+    var listener : NoteAdapter.OnItemListener
 
-    public constructor(noteList:MutableList<Note>, onItemListener: NoteAdapter.OnItemListener)
+    constructor(noteList:MutableList<Note>, onItemListener: NoteAdapter.OnItemListener)
     {
         this.NotesList = noteList
         this.listener = onItemListener
@@ -31,21 +31,16 @@ class NoteAdapter : RecyclerView.Adapter<NoteHolder> {
     }
 
     override fun onBindViewHolder(holder: NoteHolder, position: Int) {
-        holder.noteNameText.setText(NotesList.get(position).Name)
-        holder.noteDescriptionText.setText(NotesList.get(position).Description)
+        holder.noteNameText.text = NotesList.get(position).Name
+        holder.noteDescriptionText.text = NotesList.get(position).Description
     }
 
     override fun getItemCount(): Int {
         return NotesList.size
     }
 
-    fun Add(note: Note) {
-        NotesList.add(note)
-        this.notifyItemInserted(NotesList.size-1)
-    }
-
-    public interface OnItemListener
+    interface OnItemListener
     {
-        fun onItemClick(position: Int, dayText:String)
+        fun onItemClick(position: Int)
     }
 }
