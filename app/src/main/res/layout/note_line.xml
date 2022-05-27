@@ -11,29 +11,55 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text=""
+        android:layout_marginTop="5dp"
         app:layout_constraintBottom_toTopOf="@+id/NoteDescription"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/checkBox"
+        app:layout_constraintEnd_toStartOf="@+id/timeStart"
+        app:layout_constraintStart_toEndOf="@+id/checkBoxState"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText" />
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/checkBoxState"
         android:layout_width="46dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/NoteDescription"
+        android:layout_marginTop="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/NoteName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/NoteName" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/NoteDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text=""
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/checkBox"
+        android:layout_marginTop="5dp"
+        app:layout_constraintEnd_toStartOf="@+id/timeEnd"
+        app:layout_constraintStart_toEndOf="@+id/checkBoxState"
         app:layout_constraintTop_toBottomOf="@+id/NoteName"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/timeStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_marginTop="5dp"
+        app:layout_constraintStart_toEndOf="@id/NoteName"
+        app:layout_constraintBottom_toBottomOf="@id/NoteName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/timeEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/NoteDescription"
+        app:layout_constraintTop_toTopOf="@+id/NoteDescription"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

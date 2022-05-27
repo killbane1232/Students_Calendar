@@ -21,6 +21,9 @@ import com.example.students_calendar.adapters.CalendarAdapter
 import com.example.students_calendar.adapters.NoteAdapter
 import com.example.students_calendar.data.Note
 import com.example.students_calendar.data.NoteState
+import com.example.students_calendar.dialogs.NoteListDialog
+import com.example.students_calendar.dialogs.RedactNoteDialog
+import com.example.students_calendar.file_workers.NotesFile
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -42,8 +45,7 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
     private lateinit var monthText:TextView
     private lateinit var calendarView:RecyclerView
     private lateinit var selectedDate:LocalDate
-
-    private lateinit var FILE_NAME:String
+    private var adapter:NoteAdapter?=null
 
     companion object {
         fun getInstance(
@@ -116,7 +118,6 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
     }
 
     private fun initWidgets() {
-        FILE_NAME=resources.getString(R.string.notes_file)
         calendarView = findViewById(R.id.notesListView)
         monthText = findViewById(R.id.monthTV)
     }
@@ -125,21 +126,11 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
     override fun onItemClick(position: Int, dayText: String) {
         if(dayText.equals(""))
             return
-            var NotesList = listOf<Note>()
-            var fis: FileInputStream? = null
-            try {
-                fis = openFileInput(FILE_NAME)
-                val listType: Type = object : TypeToken<ArrayList<Note>>() {}.type
-                NotesList = Gson().fromJson(fis.reader(), listType)
-            } catch (ex: Exception) {
-                Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
-            } finally {
-                try {
-                    fis?.close()
-                } catch (ex: IOException) {
-                    Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
-                }
-            }
+
+        val notesFile = NotesFile(this)
+
+        val NotesList = notesFile.ReadNotes()
+
         val DayClicked:LocalDate
         val dayOfMonth = dayText.toInt()
         var daysDif = (selectedDate.dayOfMonth-dayOfMonth).toLong()
@@ -147,26 +138,14 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
             DayClicked = selectedDate.minusDays(daysDif)
         else
             DayClicked = selectedDate.plusDays(-daysDif)
+        val epoch = DayClicked.toEpochDay()
         val filterResult = NotesList.filter { x ->
-            x.StartDate!=null && x.StartDate!!.isBefore(DayClicked) &&  x.EndDate!=null && x.EndDate!!.isAfter(DayClicked
-            )
+            x.StartDate!=null && x.EndDate!=null && (x.StartDate!!.toEpochDay()<=epoch &&   x.EndDate!!.toEpochDay()>=epoch)
         }
 
-        val customView = layoutInflater.inflate(R.layout.dialog_calendar_notes, null)
-        val notesList = customView.findViewById<RecyclerView>(R.id.notesListView)
-        val layoutManger = LinearLayoutManager(applicationContext)
-        notesList.layoutManager = layoutManger
         val listToUse = mutableListOf<Note>()
         listToUse.addAll(filterResult)
-        val adapter = NoteAdapter(listToUse,this)
-        notesList.adapter = adapter
-        AlertDialog.Builder(this)
-            .setTitle(R.string.node_create)
-            .setView(customView)
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                Toast.makeText(this,"УРА", Toast.LENGTH_LONG)
-            }.show()
+        NoteListDialog(this).createDialog("Заметки на "+DayClicked.toString(), listToUse, this)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -187,6 +166,5 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
         this.startActivity(MenuActivity.getInstance(this))}
 
     override fun onItemClick(position: Int) {
-        TODO("Not yet implemented")
     }
 }

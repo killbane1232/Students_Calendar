@@ -9,12 +9,15 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.students_calendar.R
 import com.example.students_calendar.adapters.NoteAdapter
 import com.example.students_calendar.data.Note
 import com.example.students_calendar.data.NoteState
+import com.example.students_calendar.dialogs.RedactNoteDialog
+import com.example.students_calendar.file_workers.NotesFile
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.internal.LinkedTreeMap
@@ -59,30 +62,20 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
 
     private fun initWidgets() {
 
-        FILE_NAME=resources.getString(R.string.notes_file)
 
         notesList = findViewById(R.id.notesListView)
         val layoutManger = LinearLayoutManager(applicationContext)
         notesList.layoutManager = layoutManger
+
+        val fileReader = NotesFile(this)
+
+        var notes = fileReader.ReadNotes()
+
+        NotesList.addAll(notes)
+
         val adapter = NoteAdapter(NotesList,this)
         notesList.adapter = adapter
         Adapter = adapter
-
-        var fis: FileInputStream? = null
-        try {
-            fis = openFileInput(FILE_NAME)
-            val listType: Type = object : TypeToken<ArrayList<Note>>() {}.type
-            NotesList.addAll(Gson().fromJson(fis.reader(), listType))
-            Adapter.notifyDataSetChanged()
-        } catch (ex: Exception) {
-            Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
-        } finally {
-            try {
-                fis?.close()
-            } catch (ex: IOException) {
-                Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     fun addNoteAction(view: View) {
@@ -148,6 +141,7 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
                 periodTime.visibility = View.GONE
             }
         }
+
         AlertDialog.Builder(this)
             .setTitle(R.string.node_create)
             .setView(customView)
@@ -158,7 +152,7 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 var view = customView.findViewById<TextInputEditText>(R.id.NoteNameInput)
                 val name = view.text
-                val newNote = Note(name.toString(), NoteState.New, false)
+                val newNote = Note(name.toString(), NoteState.New, checkBoxPeriodic.isChecked)
                 view = customView.findViewById(R.id.NoteDescriptionInput)
                 val description = view.text
                 newNote.Description = description.toString()
@@ -182,20 +176,7 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
                 {
 
                 }
-                var fos: FileOutputStream? = null
-                val text = Gson().toJson(NotesList)
-                try {
-                    fos = openFileOutput(FILE_NAME, MODE_PRIVATE)
-                    fos.write(text.toByteArray())
-                } catch (ex: IOException) {
-                    Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
-                } finally {
-                    try {
-                        fos?.close()
-                    } catch (ex: IOException) {
-                        Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
+                NotesFile(this).WriteNotes(NotesList)
             }.show()
     }
     fun calendarAction(view: View) {
@@ -206,6 +187,7 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
     fun previousMonthAction(view: View) {}
     fun nextMonthAction(view: View) {}
     override fun onItemClick(position: Int) {
+        RedactNoteDialog(this).createDialog(Adapter,position)
 
     }
 
