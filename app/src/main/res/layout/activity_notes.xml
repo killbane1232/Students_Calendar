@@ -10,6 +10,7 @@
     app:layout_constraintTop_toTopOf="parent"
     tools:context=".activities.NotesActivity">
     <LinearLayout
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -47,6 +48,7 @@
 
     </LinearLayout>
     <Spinner
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:drawable/btn_dropdown"
@@ -61,9 +63,15 @@
     <Button
         android:id="@+id/addNote"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:layout_weight="0"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:layout_marginBottom="1dp"
         android:onClick="addNoteAction"
-        android:text="+" />
+        android:background="@drawable/rounded_background_primary"
+        android:text="+"
+        android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -71,32 +79,33 @@
         android:orientation="horizontal"
         android:layout_weight="0">
 
-        <Button
+        <ImageButton
             android:id="@+id/calendarButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="@string/prev"
+            android:layout_marginEnd="1dp"
             android:onClick="calendarAction"
-            android:textAlignment="center"
-            android:textSize="20sp" />
-        <Button
+            android:background="@drawable/rounded_background_primary"
+            android:src="?attr/calendarIcon"/>
+        <ImageButton
             android:id="@+id/notesButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="@string/prev"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
             android:onClick="notesAction"
-            android:textAlignment="center"
-            android:textSize="20sp" />
-        <Button
+            android:background="@drawable/rounded_background_primary_variant"
+            android:src="?attr/noteIcon"/>
+        <ImageButton
             android:id="@+id/menuButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="@string/prev"
+            android:layout_marginStart="1dp"
             android:onClick="menuAction"
-            android:textAlignment="center"
-            android:textSize="20sp" />
+            android:background="@drawable/rounded_background_primary"
+            android:src="?attr/menuIcon" />
     </LinearLayout>
 </LinearLayout>

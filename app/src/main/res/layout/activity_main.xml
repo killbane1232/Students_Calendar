@@ -106,32 +106,33 @@
         android:orientation="horizontal"
         android:layout_weight="0">
 
-        <Button
+        <ImageButton
             android:id="@+id/calendarButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="@string/prev"
+            android:layout_marginEnd="1dp"
             android:onClick="calendarAction"
-            android:textAlignment="center"
-            android:textSize="20sp" />
-        <Button
+            android:background="@drawable/rounded_background_primary_variant"
+            android:src="?attr/calendarIcon"/>
+        <ImageButton
             android:id="@+id/notesButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="@string/prev"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
             android:onClick="notesAction"
-            android:textAlignment="center"
-            android:textSize="20sp" />
-        <Button
+            android:background="@drawable/rounded_background_primary"
+            android:src="?attr/noteIcon"/>
+        <ImageButton
             android:id="@+id/menuButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="@string/prev"
+            android:layout_marginStart="1dp"
             android:onClick="menuAction"
-            android:textAlignment="center"
-            android:textSize="20sp" />
+            android:background="@drawable/rounded_background_primary"
+            android:src="?attr/menuIcon" />
     </LinearLayout>
 </LinearLayout>

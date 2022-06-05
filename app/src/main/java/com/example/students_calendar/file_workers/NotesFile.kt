@@ -53,6 +53,8 @@ class NotesFile {
                 .create()
                 .fromJson(fis.reader(), listType)
         } catch (ex: Exception) {
+            if(!File(FILE_NAME).exists())
+                WriteNotes(NotesList)
             Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
         } finally {
             try {

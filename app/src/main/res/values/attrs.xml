@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- declare noteIcon attribute -->
+    <attr name="noteIcon" format="reference"/>
+
+    <!-- declare menuIcon attribute -->
+    <attr name="menuIcon" format="reference"/>
+
+    <!-- declare calendarIcon attribute -->
+    <attr name="calendarIcon" format="reference"/>
+
+    <!-- declare our custom widget to be styleable by these attributes -->
+    <declare-styleable name="com.example.students_calendar">
+        <attr name="calendarIcon" />
+        <attr name="noteIcon" />
+        <attr name="menuIcon" />
+    </declare-styleable>
+</resources>
