@@ -14,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import com.example.students_calendar.R
 import com.example.students_calendar.annotations.LaunchActivityResult
 import com.example.students_calendar.data.Note
+import com.example.students_calendar.dialogs.FileChooserDialog
 import com.example.students_calendar.file_workers.NotesFile
 import com.obsez.android.lib.filechooser.ChooserDialog
 import java.io.File
@@ -79,50 +80,20 @@ class MenuActivity : AppCompatActivity() {
                 LaunchActivityResult.permissions
             )
         } else {
-            ChooserDialog(this)
-                .withFilter(false, false, "json")
-                .withChosenListener { _, file ->
-                    val notesFile = NotesFile(this)
-                    var notes:MutableList<Note>
-                    try {
-                        notes = notesFile.ReadNotes().toMutableList()
-                    }
-                    catch (ex:IOException)
-                    {
-                        notes = mutableListOf()
-                    }
-                    var newNotes:List<Note>
-                    try {
-                        newNotes = notesFile.ReadNotes(file)
-                        newNotes.forEach{
-                            var new = it
-                            var note = notes.find ({ (it.Name == new.Name) })
-                            if(note==null)
-                            {
-                                notes.add(it)
-                            }
-                            else
-                                if( it.Description != new.Description ||
-                                    it.IsPeriodic != new.IsPeriodic ||
-                                    it.EndDate != new.EndDate ||
-                                    it.StartDate != new.StartDate ||
-                                    it.EndTime != new.EndTime ||
-                                    it.StartTime != new.StartTime ||
-                                    it.PeriodMinutes != new.PeriodMinutes ||
-                                    it.PeriodDays != new.PeriodDays ||
-                                    it.PeriodMonths != new.PeriodMonths||
-                                    it.PeriodYears != new.PeriodYears)
-                                    notes.add(it)
-                        }
-                        notesFile.WriteNotes(notes)
-                    }
-                    catch (ex:Exception)
-                    {
-                        Toast.makeText(this, ex.message, Toast.LENGTH_LONG)
-                    }
-                }
-                .build()
-                .show()
+            FileChooserDialog(this).showDialog("json")
+        }
+    }
+    fun ImportNotesPDF(view: View) {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                LaunchActivityResult.permissions
+            )
+        } else {
+            FileChooserDialog(this).showDialog("pdf")
         }
     }
     fun WipeNotes(view: View) {

@@ -1,5 +1,7 @@
 package com.example.students_calendar.activities
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -80,34 +82,34 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
 
     fun addNoteAction(view: View) {
         val customView = layoutInflater.inflate(R.layout.dialog_create_note, null)
-        val beginDate = customView.findViewById<TextInputEditText>(R.id.beginDateText)
-        val endDate = customView.findViewById<TextInputEditText>(R.id.endDateText)
-        val beginTime = customView.findViewById<TextInputEditText>(R.id.beginTimeText)
-        val endTime = customView.findViewById<TextInputEditText>(R.id.endTimeText)
+        val beginDateButton = customView.findViewById<Button>(R.id.beginDateText)
+        val endDateButton = customView.findViewById<Button>(R.id.endDateText)
+        val beginTimeButton = customView.findViewById<Button>(R.id.beginTimeText)
+        val endTimeButton = customView.findViewById<Button>(R.id.endTimeText)
         val periodDate = customView.findViewById<TextInputEditText>(R.id.periodDateText)
         val periodTime = customView.findViewById<TextInputEditText>(R.id.periodTimeText)
 
+        var beginDate:LocalDate?=null
+        var endDate:LocalDate?=null
+        var beginTime:LocalTime?=null
+        var endTime:LocalTime?=null
 
-        val dates = arrayOf(beginDate,endDate,periodDate)
-        val times = arrayOf(beginTime,endTime,periodTime)
-        for (i in 0..1)
-        {
-            val slotsDate = UnderscoreDigitSlotsParser().parseSlots("____-__-__")
-            val formatWatcherDate: FormatWatcher = MaskFormatWatcher(
-                MaskImpl.createTerminated(slotsDate)
-            )
-            formatWatcherDate.installOn(dates[i])
+        val slotsDate = UnderscoreDigitSlotsParser().parseSlots("____-__-__")
+        val formatWatcherDate: FormatWatcher = MaskFormatWatcher(
+            MaskImpl.createTerminated(slotsDate)
+        )
+        formatWatcherDate.installOn(periodDate)
 
-            val slotsTime = UnderscoreDigitSlotsParser().parseSlots("__:__")
-            val formatWatcherTime: FormatWatcher = MaskFormatWatcher(
-                MaskImpl.createTerminated(slotsTime))
-            formatWatcherTime.installOn(times[i])
-        }
+        val slotsTime = UnderscoreDigitSlotsParser().parseSlots("__:__")
+        val formatWatcherTime: FormatWatcher = MaskFormatWatcher(
+            MaskImpl.createTerminated(slotsTime)
+        )
+        formatWatcherTime.installOn(periodTime)
 
-        beginDate.visibility = View.GONE
-        endDate.visibility = View.GONE
-        beginTime.visibility = View.GONE
-        endTime.visibility = View.GONE
+        beginDateButton.visibility = View.GONE
+        endDateButton.visibility = View.GONE
+        beginTimeButton.visibility = View.GONE
+        endTimeButton.visibility = View.GONE
         periodDate.visibility = View.GONE
         periodTime.visibility = View.GONE
 
@@ -116,20 +118,20 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
         val checkBoxPeriodic = customView.findViewById<CheckBox>(R.id.checkBoxPeriodic)
         checkBoxDate.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             if (b) {
-                beginDate.visibility = View.VISIBLE
-                endDate.visibility = View.VISIBLE
+                beginDateButton.visibility = View.VISIBLE
+                endDateButton.visibility = View.VISIBLE
             } else {
-                beginDate.visibility = View.GONE
-                endDate.visibility = View.GONE
+                beginDateButton.visibility = View.GONE
+                endDateButton.visibility = View.GONE
             }
         }
         checkBoxTime.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             if (b) {
-                beginTime.visibility = View.VISIBLE
-                endTime.visibility = View.VISIBLE
+                beginTimeButton.visibility = View.VISIBLE
+                endTimeButton.visibility = View.VISIBLE
             } else {
-                beginTime.visibility = View.GONE
-                endTime.visibility = View.GONE
+                beginTimeButton.visibility = View.GONE
+                endTimeButton.visibility = View.GONE
             }
         }
         checkBoxPeriodic.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
@@ -140,6 +142,96 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
                 periodDate.visibility = View.GONE
                 periodTime.visibility = View.GONE
             }
+        }
+
+
+        beginDateButton.setOnClickListener{
+            val dateSetter = Calendar.getInstance()
+            if(beginDate!=null)
+                dateSetter.set(beginDate!!.year,beginDate!!.monthValue-1,beginDate!!.dayOfMonth)
+            val d =
+                DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                    dateSetter.set(Calendar.YEAR, year)
+                    dateSetter.set(Calendar.MONTH, monthOfYear)
+                    dateSetter.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    beginDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
+                    beginDateButton.text = beginDate.toString()
+                    if (endDate == null || beginDate!!.isAfter(endDate)) {
+                        endDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
+                        endDateButton.text = endDate.toString()
+                    }
+                }
+            DatePickerDialog(
+                this, d,
+                dateSetter.get(Calendar.YEAR),
+                dateSetter.get(Calendar.MONTH),
+                dateSetter.get(Calendar.DAY_OF_MONTH)
+            )
+                .show()
+        }
+        endDateButton.setOnClickListener{
+            val dateSetter = Calendar.getInstance()
+            if(endDate!=null)
+                dateSetter.set(endDate!!.year,endDate!!.monthValue-1,endDate!!.dayOfMonth)
+            val d =
+                DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                    dateSetter.set(Calendar.YEAR, year)
+                    dateSetter.set(Calendar.MONTH, monthOfYear)
+                    dateSetter.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    endDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
+                    endDateButton.text = endDate.toString()
+                    if (beginDate == null || endDate!!.isBefore(beginDate)) {
+                        beginDate = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
+                        beginDateButton.text = beginDate.toString()
+                    }
+                }
+            DatePickerDialog(
+                this, d,
+                dateSetter.get(Calendar.YEAR),
+                dateSetter.get(Calendar.MONTH),
+                dateSetter.get(Calendar.DAY_OF_MONTH)
+            )
+                .show()
+        }
+        beginTimeButton.setOnClickListener{
+            val timeSetter = Calendar.getInstance()
+            var t =
+                TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+                    timeSetter.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                    timeSetter.set(Calendar.MINUTE, minute)
+                    beginTime = LocalTime.of(hourOfDay, minute)
+                    beginTimeButton.text = beginTime.toString()
+                    if (endTime == null || beginTime!!.isAfter(endTime)) {
+                        endTime = LocalTime.of(hourOfDay, minute)
+                        endTimeButton.text = endTime.toString()
+                    }
+                }
+            TimePickerDialog(
+                this, t,
+                timeSetter.get(Calendar.HOUR_OF_DAY),
+                timeSetter.get(Calendar.MINUTE), true
+            )
+                .show()
+        }
+        endTimeButton.setOnClickListener{
+            val timeSetter = Calendar.getInstance()
+            var t =
+                TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+                    timeSetter.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                    timeSetter.set(Calendar.MINUTE, minute)
+                    endTime = LocalTime.of(hourOfDay, minute)
+                    endTimeButton.text = endTime.toString()
+                    if (beginTime == null || endTime!!.isBefore(beginTime)) {
+                        beginTime = LocalTime.of(hourOfDay, minute)
+                        beginTimeButton.text = beginTime.toString()
+                    }
+                }
+            TimePickerDialog(
+                this, t,
+                timeSetter.get(Calendar.HOUR_OF_DAY),
+                timeSetter.get(Calendar.MINUTE), true
+            )
+                .show()
         }
 
         AlertDialog.Builder(this)
@@ -160,17 +252,13 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
                 Adapter.notifyItemInserted(NotesList.size-1)
                 if(checkBoxDate.isChecked)
                 {
-                    var dateText = beginDate.text.toString()
-                    newNote.StartDate = LocalDate.parse(dateText, DateTimeFormatter.ISO_DATE)
-                    dateText = endDate.text.toString()
-                    newNote.EndDate = LocalDate.parse(dateText, DateTimeFormatter.ISO_DATE)
+                    newNote.StartDate = beginDate
+                    newNote.EndDate = endDate
                 }
                 if(checkBoxTime.isChecked)
                 {
-                    var dateText = beginTime.text.toString()
-                    newNote.StartTime = LocalTime.parse(dateText, DateTimeFormatter.ISO_TIME)
-                    dateText = endTime.text.toString()
-                    newNote.EndTime = LocalTime.parse(dateText, DateTimeFormatter.ISO_TIME)
+                    newNote.StartTime = beginTime
+                    newNote.EndTime = endTime
                 }
                 if(checkBoxPeriodic.isChecked)
                 {

@@ -36,26 +36,24 @@
         app:layout_constraintTop_toBottomOf="@+id/NoteNameInput"
         tools:ignore="HardcodedText" />
 
-    <com.google.android.material.textfield.TextInputEditText
+    <Button
         android:id="@+id/beginDateText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
-        android:inputType="date"
         android:hint="Дата начала"
         app:layout_constraintTop_toBottomOf="@id/checkBoxDate"
         app:layout_constraintBottom_toTopOf="@+id/endDateText"
         app:layout_constraintEnd_toEndOf="@+id/checkBoxDate"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.google.android.material.textfield.TextInputEditText
+    <Button
         android:id="@+id/endDateText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
-        android:inputType="date"
         android:hint="Дата конца"
         app:layout_constraintTop_toBottomOf="@id/beginDateText"
         app:layout_constraintBottom_toTopOf="@+id/checkBoxPeriodic"
@@ -74,27 +72,25 @@
         app:layout_constraintEnd_toStartOf="@id/periodTimeText"
         app:layout_constraintTop_toBottomOf="@id/checkBoxPeriodic"/>
 
-    <com.google.android.material.textfield.TextInputEditText
+    <Button
         android:id="@+id/beginTimeText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
         android:hint="Время начала"
-        android:inputType="time"
         app:layout_constraintBottom_toTopOf="@+id/endTimeText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/checkBoxTime"
         app:layout_constraintTop_toBottomOf="@+id/checkBoxTime" />
 
-    <com.google.android.material.textfield.TextInputEditText
+    <Button
         android:id="@+id/endTimeText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
         android:hint="Время конца"
-        android:inputType="time"
         app:layout_constraintBottom_toTopOf="@+id/checkBoxPeriodic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/checkBoxTime"

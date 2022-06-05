@@ -1,14 +1,20 @@
 package com.example.students_calendar.dialogs
 
+import android.app.DatePickerDialog
+import android.app.DatePickerDialog.OnDateSetListener
+import android.app.TimePickerDialog
+import android.app.TimePickerDialog.OnTimeSetListener
+import android.graphics.pdf.PdfDocument
 import android.view.View
-import android.widget.Adapter
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.students_calendar.R
-import com.example.students_calendar.data.Note
+import com.example.students_calendar.adapters.NoteAdapter
 import com.example.students_calendar.data.NoteState
+import com.example.students_calendar.file_workers.NotesFile
 import com.google.android.material.textfield.TextInputEditText
 import ru.tinkoff.decoro.MaskImpl
 import ru.tinkoff.decoro.parser.UnderscoreDigitSlotsParser
@@ -18,11 +24,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import androidx.lifecycle.Observer
-import androidx.lifecycle.LiveData
-import com.example.students_calendar.adapters.NoteAdapter
-import com.example.students_calendar.file_workers.NotesFile
-import java.text.FieldPosition
+
 
 class RedactNoteDialog {
     val parent: AppCompatActivity
@@ -34,34 +36,125 @@ class RedactNoteDialog {
 
     fun createDialog(adapter: NoteAdapter, position: Int) {
         val customView = parent.layoutInflater.inflate(R.layout.dialog_create_note, null)
-        val beginDate = customView.findViewById<TextInputEditText>(R.id.beginDateText)
-        val endDate = customView.findViewById<TextInputEditText>(R.id.endDateText)
-        val beginTime = customView.findViewById<TextInputEditText>(R.id.beginTimeText)
-        val endTime = customView.findViewById<TextInputEditText>(R.id.endTimeText)
+        val beginDateButton = customView.findViewById<Button>(R.id.beginDateText)
+        val endDateButton = customView.findViewById<Button>(R.id.endDateText)
+        val beginTimeButton = customView.findViewById<Button>(R.id.beginTimeText)
+        val endTimeButton = customView.findViewById<Button>(R.id.endTimeText)
         val periodDate = customView.findViewById<TextInputEditText>(R.id.periodDateText)
         val periodTime = customView.findViewById<TextInputEditText>(R.id.periodTimeText)
 
+        var beginDate:LocalDate?=null
+        var endDate:LocalDate?=null
+        var beginTime:LocalTime?=null
+        var endTime:LocalTime?=null
 
-        val dates = arrayOf(beginDate, endDate, periodDate)
-        val times = arrayOf(beginTime, endTime, periodTime)
-        for (i in 0..1) {
-            val slotsDate = UnderscoreDigitSlotsParser().parseSlots("____-__-__")
-            val formatWatcherDate: FormatWatcher = MaskFormatWatcher(
-                MaskImpl.createTerminated(slotsDate)
+        beginDateButton.setOnClickListener{
+            val dateSetter = Calendar.getInstance()
+            if(beginDate!=null)
+                dateSetter.set(beginDate!!.year,beginDate!!.monthValue-1,beginDate!!.dayOfMonth)
+            val d =
+                OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                    dateSetter.set(Calendar.YEAR, year)
+                    dateSetter.set(Calendar.MONTH, monthOfYear)
+                    dateSetter.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    beginDate = LocalDate.of(year,monthOfYear+1,dayOfMonth)
+                    beginDateButton.text = beginDate.toString()
+                    if(endDate==null||beginDate!!.isAfter(endDate))
+                    {
+                        endDate = LocalDate.of(year,monthOfYear+1,dayOfMonth)
+                        endDateButton.text = endDate.toString()
+                    }
+                }
+            DatePickerDialog(
+                parent, d,
+                dateSetter.get(Calendar.YEAR),
+                dateSetter.get(Calendar.MONTH),
+                dateSetter.get(Calendar.DAY_OF_MONTH)
             )
-            formatWatcherDate.installOn(dates[i])
-
-            val slotsTime = UnderscoreDigitSlotsParser().parseSlots("__:__")
-            val formatWatcherTime: FormatWatcher = MaskFormatWatcher(
-                MaskImpl.createTerminated(slotsTime)
+                .show()
+        }
+        endDateButton.setOnClickListener{
+            val dateSetter = Calendar.getInstance()
+            if(endDate!=null)
+                dateSetter.set(endDate!!.year,endDate!!.monthValue-1,endDate!!.dayOfMonth)
+            val d =
+                OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                    dateSetter.set(Calendar.YEAR, year)
+                    dateSetter.set(Calendar.MONTH, monthOfYear)
+                    dateSetter.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    endDate = LocalDate.of(year,monthOfYear+1,dayOfMonth)
+                    endDateButton.text = endDate.toString()
+                    if(beginDate==null||endDate!!.isBefore(beginDate))
+                    {
+                        beginDate = LocalDate.of(year,monthOfYear+1,dayOfMonth)
+                        beginDateButton.text = beginDate.toString()
+                    }
+                }
+            DatePickerDialog(
+                parent, d,
+                dateSetter.get(Calendar.YEAR),
+                dateSetter.get(Calendar.MONTH),
+                dateSetter.get(Calendar.DAY_OF_MONTH)
             )
-            formatWatcherTime.installOn(times[i])
+                .show()
+        }
+        beginTimeButton.setOnClickListener{
+            val timeSetter = Calendar.getInstance()
+            var t =
+                OnTimeSetListener { view, hourOfDay, minute ->
+                    timeSetter.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                    timeSetter.set(Calendar.MINUTE, minute)
+                    beginTime = LocalTime.of(hourOfDay,minute)
+                    beginTimeButton.text = beginTime.toString()
+                    if(endTime==null||beginTime!!.isAfter(endTime)) {
+                        endTime = LocalTime.of(hourOfDay,minute)
+                        endTimeButton.text = endTime.toString()
+                    }
+                }
+            TimePickerDialog(
+                parent, t,
+                timeSetter.get(Calendar.HOUR_OF_DAY),
+                timeSetter.get(Calendar.MINUTE), true
+            )
+                .show()
+        }
+        endTimeButton.setOnClickListener{
+            val timeSetter = Calendar.getInstance()
+            var t =
+                OnTimeSetListener { view, hourOfDay, minute ->
+                    timeSetter.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                    timeSetter.set(Calendar.MINUTE, minute)
+                    endTime = LocalTime.of(hourOfDay,minute)
+                    endTimeButton.text = endTime.toString()
+                    if(beginTime==null||endTime!!.isBefore(beginTime)) {
+                        beginTime = LocalTime.of(hourOfDay, minute)
+                        beginTimeButton.text = beginTime.toString()
+                    }
+                }
+            TimePickerDialog(
+                parent, t,
+                timeSetter.get(Calendar.HOUR_OF_DAY),
+                timeSetter.get(Calendar.MINUTE), true
+            )
+                .show()
         }
 
-        beginDate.visibility = View.GONE
-        endDate.visibility = View.GONE
-        beginTime.visibility = View.GONE
-        endTime.visibility = View.GONE
+        val slotsDate = UnderscoreDigitSlotsParser().parseSlots("____-__-__")
+        val formatWatcherDate: FormatWatcher = MaskFormatWatcher(
+            MaskImpl.createTerminated(slotsDate)
+        )
+        formatWatcherDate.installOn(periodDate)
+
+        val slotsTime = UnderscoreDigitSlotsParser().parseSlots("__:__")
+        val formatWatcherTime: FormatWatcher = MaskFormatWatcher(
+            MaskImpl.createTerminated(slotsTime)
+        )
+        formatWatcherTime.installOn(periodTime)
+
+        beginDateButton.visibility = View.GONE
+        endDateButton.visibility = View.GONE
+        beginTimeButton.visibility = View.GONE
+        endTimeButton.visibility = View.GONE
         periodDate.visibility = View.GONE
         periodTime.visibility = View.GONE
 
@@ -77,36 +170,36 @@ class RedactNoteDialog {
         val checkBoxDate = customView.findViewById<CheckBox>(R.id.checkBoxDate)
         if(note.StartDate!=null && note.EndDate != null){
             checkBoxDate.isChecked = true
-            beginDate.visibility = View.VISIBLE
-            beginDate.setText(note.StartDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-            endDate.visibility = View.VISIBLE
-            endDate.setText(note.EndDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+            beginDateButton.visibility = View.VISIBLE
+            beginDateButton.setText(note.StartDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+            endDateButton.visibility = View.VISIBLE
+            endDateButton.setText(note.EndDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
         }
         val checkBoxTime = customView.findViewById<CheckBox>(R.id.checkBoxTime)
         if(note.StartTime!=null){
             checkBoxTime.isChecked = true
-            beginTime.visibility = View.VISIBLE
-            beginTime.setText(note.StartTime?.format(DateTimeFormatter.ofPattern("HH:mm")))
-            endTime.visibility = View.VISIBLE
-            endTime.setText(note.EndTime?.format(DateTimeFormatter.ofPattern("HH:mm")))
+            beginTimeButton.visibility = View.VISIBLE
+            beginTimeButton.setText(note.StartTime?.format(DateTimeFormatter.ofPattern("HH:mm")))
+            endTimeButton.visibility = View.VISIBLE
+            endTimeButton.setText(note.EndTime?.format(DateTimeFormatter.ofPattern("HH:mm")))
         }
         val checkBoxPeriodic = customView.findViewById<CheckBox>(R.id.checkBoxPeriodic)
         checkBoxDate.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             if (b) {
-                beginDate.visibility = View.VISIBLE
-                endDate.visibility = View.VISIBLE
+                beginDateButton.visibility = View.VISIBLE
+                endDateButton.visibility = View.VISIBLE
             } else {
-                beginDate.visibility = View.GONE
-                endDate.visibility = View.GONE
+                beginDateButton.visibility = View.GONE
+                endDateButton.visibility = View.GONE
             }
         }
         checkBoxTime.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             if (b) {
-                beginTime.visibility = View.VISIBLE
-                endTime.visibility = View.VISIBLE
+                beginTimeButton.visibility = View.VISIBLE
+                endTimeButton.visibility = View.VISIBLE
             } else {
-                beginTime.visibility = View.GONE
-                endTime.visibility = View.GONE
+                beginTimeButton.visibility = View.GONE
+                endTimeButton.visibility = View.GONE
             }
         }
         checkBoxPeriodic.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
@@ -119,7 +212,7 @@ class RedactNoteDialog {
             }
         }
 
-        val dialogBuilder = AlertDialog.Builder(parent)
+        AlertDialog.Builder(parent)
             .setTitle(R.string.node_create)
             .setView(customView)
             .setCancelable(false)
@@ -135,16 +228,12 @@ class RedactNoteDialog {
 
                 note.Description = descriptionView.text.toString()
                 if (checkBoxDate.isChecked) {
-                    var dateText = beginDate.text.toString()
-                    note.StartDate = LocalDate.parse(dateText, DateTimeFormatter.ISO_DATE)
-                    dateText = endDate.text.toString()
-                    note.EndDate = LocalDate.parse(dateText, DateTimeFormatter.ISO_DATE)
+                    note.StartDate = beginDate
+                    note.EndDate = endDate
                 }
                 if (checkBoxTime.isChecked) {
-                    var dateText = beginTime.text.toString()
-                    note.StartTime = LocalTime.parse(dateText, DateTimeFormatter.ISO_TIME)
-                    dateText = endTime.text.toString()
-                    note.EndTime = LocalTime.parse(dateText, DateTimeFormatter.ISO_TIME)
+                    note.StartTime = beginTime
+                    note.EndTime = endTime
                 }
                 if (checkBoxPeriodic.isChecked) {
                 }

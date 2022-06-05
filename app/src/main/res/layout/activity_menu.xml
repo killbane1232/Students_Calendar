@@ -25,6 +25,13 @@
         android:text="ImportNotes"
         android:onClick="ImportNotes"/>
     <Button
+        android:id="@+id/importPdfButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:text="ImportNotesPdf"
+        android:onClick="ImportNotesPDF"/>
+    <Button
         android:id="@+id/wipeButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
