@@ -39,6 +39,14 @@
         android:text="WipeNotes"
         android:onClick="WipeNotes"/>
 
+    <Button
+        android:id="@+id/wipeSheduleButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:onClick="WipeShedule"
+        android:text="WipeShedule" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

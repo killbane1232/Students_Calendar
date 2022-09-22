@@ -8,35 +8,16 @@ import androidx.recyclerview.widget.RecyclerView
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.students_calendar.R
 import com.example.students_calendar.adapters.CalendarAdapter
 import com.example.students_calendar.adapters.NoteAdapter
 import com.example.students_calendar.data.Note
-import com.example.students_calendar.data.NoteState
 import com.example.students_calendar.dialogs.NoteListDialog
-import com.example.students_calendar.dialogs.RedactNoteDialog
 import com.example.students_calendar.file_workers.NotesFile
-import com.google.android.material.textfield.TextInputEditText
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import ru.tinkoff.decoro.MaskImpl
-import ru.tinkoff.decoro.parser.UnderscoreDigitSlotsParser
-import ru.tinkoff.decoro.watchers.FormatWatcher
-import ru.tinkoff.decoro.watchers.MaskFormatWatcher
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.lang.reflect.Type
 import java.time.LocalDate
-import java.time.LocalTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -139,12 +120,28 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
         else
             DayClicked = selectedDate.plusDays(-daysDif)
         val epoch = DayClicked.toEpochDay()
-        val filterResult = NotesList.filter { x ->
-            x.StartDate!=null && x.EndDate!=null && (x.StartDate!!.toEpochDay()<=epoch &&   x.EndDate!!.toEpochDay()>=epoch)
+        val listToUse = mutableListOf<Note>()
+        NotesList.forEach {
+            var x = it
+            if(x.startDate==null || x.endDate==null)
+                return@forEach
+
+            var daysPeriod = false
+            if(x.isPeriodic)
+            {
+                var difference = epoch - x.startDate!!.toEpochDay()-((epoch - x.startDate!!.toEpochDay()) % x.periodDays!!)
+                var start = x.startDate!!.toEpochDay()+difference
+                var end = x.endDate!!.toEpochDay()+difference
+                daysPeriod = start<=epoch && end>=epoch ||
+                        start-x.periodDays!!<=epoch && end-x.periodDays!!>=epoch ||
+                        start+x.periodDays!!<=epoch && end+x.periodDays!!>=epoch
+            }
+
+            if((x.startDate!!.toEpochDay()<=epoch && x.endDate!!.toEpochDay()>=epoch)||
+                daysPeriod)
+                listToUse.add(x)
         }
 
-        val listToUse = mutableListOf<Note>()
-        listToUse.addAll(filterResult)
         NoteListDialog(this).createDialog("Заметки на "+DayClicked.toString(), listToUse, this)
     }
 

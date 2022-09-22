@@ -16,10 +16,9 @@ import com.example.students_calendar.annotations.LaunchActivityResult
 import com.example.students_calendar.data.Note
 import com.example.students_calendar.dialogs.FileChooserDialog
 import com.example.students_calendar.file_workers.NotesFile
-import com.obsez.android.lib.filechooser.ChooserDialog
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 
 
@@ -93,7 +92,20 @@ class MenuActivity : AppCompatActivity() {
                 LaunchActivityResult.permissions
             )
         } else {
+            PDFBoxResourceLoader.init(getApplicationContext())
             FileChooserDialog(this).showDialog("pdf")
+        }
+    }
+    fun WipeShedule(view: View) {
+        try{
+            val file = NotesFile(this)
+            var notes = mutableListOf<Note>()
+            notes.addAll(file.ReadNotes())
+            notes.removeAll { it.isSchedule }
+            file.WriteNotes(notes)
+        }
+        catch (ex: IOException) {
+            Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()
         }
     }
     fun WipeNotes(view: View) {

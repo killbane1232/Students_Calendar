@@ -37,7 +37,7 @@
         tools:ignore="HardcodedText" />
 
     <Button
-        android:id="@+id/beginDateText"
+        android:id="@+id/numeratorDate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -55,22 +55,22 @@
         android:layout_weight="1"
         android:ems="10"
         android:hint="Дата конца"
-        app:layout_constraintTop_toBottomOf="@id/beginDateText"
+        app:layout_constraintTop_toBottomOf="@id/numeratorDate"
         app:layout_constraintBottom_toTopOf="@+id/checkBoxPeriodic"
         app:layout_constraintEnd_toEndOf="@+id/checkBoxDate"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/periodDateText"
+        android:id="@+id/periodDaysText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
+        android:hint="Период в днях"
         android:inputType="date"
-        android:hint="Период год,месяц,день"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/periodTimeText"
-        app:layout_constraintTop_toBottomOf="@id/checkBoxPeriodic"/>
+        app:layout_constraintTop_toBottomOf="@id/checkBoxPeriodic" />
 
     <Button
         android:id="@+id/beginTimeText"
@@ -95,19 +95,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/checkBoxTime"
         app:layout_constraintTop_toBottomOf="@+id/beginTimeText" />
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/periodTimeText"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:ems="10"
-        android:hint="Период час,минута"
-        android:inputType="time"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/periodDateText"
-        app:layout_constraintTop_toBottomOf="@id/checkBoxPeriodic"
-        app:layout_constraintBottom_toBottomOf="@id/periodDateText"/>
 
     <CheckBox
         android:id="@+id/checkBoxDate"

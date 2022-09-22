@@ -5,16 +5,14 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 class Note(name: String, state: NoteState, periodic: Boolean) {
-    var Name:String = name
-    var State:NoteState = state
-    var Description:String=""
-    var StartTime: LocalTime? = null
-    var EndTime:LocalTime? = null
-    var StartDate: LocalDate? = null
-    var EndDate: LocalDate? = null
-    var IsPeriodic:Boolean = periodic
-    var PeriodYears: Int? = null
-    var PeriodMonths: Int? = null
-    var PeriodDays: Int? = null
-    var PeriodMinutes: Int? = null
+    var name:String = name
+    var state:NoteState = state
+    var description:String=""
+    var startTime: LocalTime? = null
+    var endTime:LocalTime? = null
+    var startDate: LocalDate? = null
+    var endDate: LocalDate? = null
+    var isPeriodic:Boolean = periodic
+    var periodDays: Int? = null
+    var isSchedule:Boolean = false
 }

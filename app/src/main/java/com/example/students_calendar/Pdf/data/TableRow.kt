@@ -4,6 +4,7 @@ package com.example.students_calendar.Pdf.data
 
 class TableRow(val idx: Int) {
     val cells: MutableList<TableCell> = ArrayList()
+    var index:Int = 0
 
     override fun toString(): String {
         val retVal = StringBuilder()

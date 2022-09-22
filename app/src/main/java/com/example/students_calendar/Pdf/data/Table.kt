@@ -4,10 +4,6 @@ class Table(val pageIdx: Int, private val columnsCount: Int) {
 
     var rows: MutableList<TableRow> = ArrayList()
 
-    fun toHtml(): String {
-        return toString(true)
-    }
-
     override fun toString(): String {
         return toString(false)
     }

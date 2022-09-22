@@ -11,7 +11,6 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.students_calendar.R
@@ -21,20 +20,12 @@ import com.example.students_calendar.data.NoteState
 import com.example.students_calendar.dialogs.RedactNoteDialog
 import com.example.students_calendar.file_workers.NotesFile
 import com.google.android.material.textfield.TextInputEditText
-import com.google.gson.Gson
-import com.google.gson.internal.LinkedTreeMap
-import com.google.gson.reflect.TypeToken
 import ru.tinkoff.decoro.MaskImpl
 import ru.tinkoff.decoro.parser.UnderscoreDigitSlotsParser
 import ru.tinkoff.decoro.watchers.FormatWatcher
 import ru.tinkoff.decoro.watchers.MaskFormatWatcher
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.lang.reflect.Type
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -82,12 +73,11 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
 
     fun addNoteAction(view: View) {
         val customView = layoutInflater.inflate(R.layout.dialog_create_note, null)
-        val beginDateButton = customView.findViewById<Button>(R.id.beginDateText)
+        val beginDateButton = customView.findViewById<Button>(R.id.numeratorDate)
         val endDateButton = customView.findViewById<Button>(R.id.endDateText)
         val beginTimeButton = customView.findViewById<Button>(R.id.beginTimeText)
         val endTimeButton = customView.findViewById<Button>(R.id.endTimeText)
-        val periodDate = customView.findViewById<TextInputEditText>(R.id.periodDateText)
-        val periodTime = customView.findViewById<TextInputEditText>(R.id.periodTimeText)
+        val periodDate = customView.findViewById<TextInputEditText>(R.id.periodDaysText)
 
         var beginDate:LocalDate?=null
         var endDate:LocalDate?=null
@@ -100,18 +90,11 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
         )
         formatWatcherDate.installOn(periodDate)
 
-        val slotsTime = UnderscoreDigitSlotsParser().parseSlots("__:__")
-        val formatWatcherTime: FormatWatcher = MaskFormatWatcher(
-            MaskImpl.createTerminated(slotsTime)
-        )
-        formatWatcherTime.installOn(periodTime)
-
         beginDateButton.visibility = View.GONE
         endDateButton.visibility = View.GONE
         beginTimeButton.visibility = View.GONE
         endTimeButton.visibility = View.GONE
         periodDate.visibility = View.GONE
-        periodTime.visibility = View.GONE
 
         val checkBoxDate = customView.findViewById<CheckBox>(R.id.checkBoxDate)
         val checkBoxTime = customView.findViewById<CheckBox>(R.id.checkBoxTime)
@@ -137,10 +120,8 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
         checkBoxPeriodic.setOnCheckedChangeListener { _: CompoundButton, b: Boolean ->
             if (b) {
                 periodDate.visibility = View.VISIBLE
-                periodTime.visibility = View.VISIBLE
             } else {
                 periodDate.visibility = View.GONE
-                periodTime.visibility = View.GONE
             }
         }
 
@@ -247,22 +228,24 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
                 val newNote = Note(name.toString(), NoteState.New, checkBoxPeriodic.isChecked)
                 view = customView.findViewById(R.id.NoteDescriptionInput)
                 val description = view.text
-                newNote.Description = description.toString()
+                newNote.description = description.toString()
                 NotesList.add(newNote)
                 Adapter.notifyItemInserted(NotesList.size-1)
                 if(checkBoxDate.isChecked)
                 {
-                    newNote.StartDate = beginDate
-                    newNote.EndDate = endDate
+                    newNote.startDate = beginDate
+                    newNote.endDate = endDate
                 }
                 if(checkBoxTime.isChecked)
                 {
-                    newNote.StartTime = beginTime
-                    newNote.EndTime = endTime
+                    newNote.startTime = beginTime
+                    newNote.endTime = endTime
                 }
                 if(checkBoxPeriodic.isChecked)
                 {
-
+                    newNote.isPeriodic = true
+                    view = customView.findViewById(R.id.periodDaysText)
+                    newNote.periodDays = view.text.toString().toInt()
                 }
                 NotesFile(this).WriteNotes(NotesList)
             }.show()

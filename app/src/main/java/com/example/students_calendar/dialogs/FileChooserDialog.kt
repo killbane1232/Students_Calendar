@@ -1,9 +1,7 @@
 package com.example.students_calendar.dialogs
 
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.students_calendar.adapters.NoteAdapter
 import com.example.students_calendar.data.Note
 import com.example.students_calendar.file_workers.NotesFile
 import com.obsez.android.lib.filechooser.ChooserDialog
@@ -12,14 +10,19 @@ import java.io.IOException
 class FileChooserDialog {
     val parent: AppCompatActivity
 
-    constructor(activity: AppCompatActivity)
+    constructor(parent: AppCompatActivity)
     {
-        this.parent = activity
+        this.parent = parent
     }
     fun showDialog(suffix:String) {
         ChooserDialog(parent)
             .withFilter(false, false, suffix)
             .withChosenListener { _, file ->
+
+                if (suffix == "pdf") {
+                    NumeratorDialog(parent).createDialog(file)
+                    return@withChosenListener
+                }
                 val notesFile = NotesFile(parent)
                 var notes: MutableList<Note>
                 try {
@@ -29,27 +32,19 @@ class FileChooserDialog {
                 }
                 var newNotes: List<Note>
                 try {
-                    if(suffix!="pdf")
-                        newNotes = notesFile.ReadNotes(file)
-                    else
-                        newNotes = notesFile.ReadNotesFromPDF(file)
+                    newNotes = notesFile.ReadNotes(file)
                     newNotes.forEach {
-                        var new = it
-                        var note = notes.find({ (it.Name == new.Name) })
+                        var note = notes.find{ x-> (x.name == it.name) }
                         if (note == null) {
                             notes.add(it)
                         } else
-                            if (it.Description != new.Description ||
-                                it.IsPeriodic != new.IsPeriodic ||
-                                it.EndDate != new.EndDate ||
-                                it.StartDate != new.StartDate ||
-                                it.EndTime != new.EndTime ||
-                                it.StartTime != new.StartTime ||
-                                it.PeriodMinutes != new.PeriodMinutes ||
-                                it.PeriodDays != new.PeriodDays ||
-                                it.PeriodMonths != new.PeriodMonths ||
-                                it.PeriodYears != new.PeriodYears
-                            )
+                            if (it.description != note.description ||
+                                it.isPeriodic != note.isPeriodic ||
+                                it.endDate != note.endDate ||
+                                it.startDate != note.startDate ||
+                                it.endTime != note.endTime ||
+                                it.startTime != note.startTime ||
+                                it.periodDays != note.periodDays)
                                 notes.add(it)
                     }
                     notesFile.WriteNotes(notes)

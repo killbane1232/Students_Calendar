@@ -1,16 +1,11 @@
 package com.example.students_calendar.adapters
 
-import android.content.Context
-import android.util.JsonReader
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.ListView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.students_calendar.R
 import com.example.students_calendar.data.Note
-import com.example.students_calendar.holders.CalendarViewHolder
 import com.example.students_calendar.holders.NoteHolder
 
 class NoteAdapter : RecyclerView.Adapter<NoteHolder> {
@@ -32,18 +27,18 @@ class NoteAdapter : RecyclerView.Adapter<NoteHolder> {
 
     override fun onBindViewHolder(holder: NoteHolder, position: Int) {
         val note = NotesList.get(position)
-        holder.noteNameText.text = note.Name
-        holder.noteDescriptionText.text = note.Description
+        holder.noteNameText.text = note.name
+        holder.noteDescriptionText.text = note.description
         holder.noteStartTimeText.visibility = View.GONE
         holder.noteEndTimeText.visibility = View.GONE
-        if(note.StartTime!=null)
+        if(note.startTime!=null)
         {
-            holder.noteStartTimeText.text = note.StartTime.toString()
+            holder.noteStartTimeText.text = note.startTime.toString()
             holder.noteStartTimeText.visibility = View.VISIBLE
         }
-        if(note.EndTime!=null)
+        if(note.endTime!=null)
         {
-            holder.noteEndTimeText.text = note.EndTime.toString()
+            holder.noteEndTimeText.text = note.endTime.toString()
             holder.noteEndTimeText.visibility = View.VISIBLE
         }
     }
