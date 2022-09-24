@@ -16,9 +16,6 @@ import kotlin.math.absoluteValue
 
 
 class PDFTableExtractor() {
-    private val extractedPages: MutableList<Int> = ArrayList()
-    private val exceptedPages: MutableList<Int> = ArrayList()
-
     private val pageNExceptedLines: MutableList<Int> = mutableListOf()
     private val pageNExceptedColumns: MutableList<Int> = mutableListOf()
     private var inputStream: InputStream? = null
@@ -88,7 +85,7 @@ class PDFTableExtractor() {
         pageIdx: Int, tableContent: List<TextPosition>,
         rowTrapRanges: List<Range<Int>>, columnTrapRanges: List<Range<Int>>
     ): Table {
-        val retVal = Table(pageIdx, columnTrapRanges.size)
+        val retVal = Table(columnTrapRanges.size)
         var idx = 0
         var rowIdx = 0
         val rowContent: MutableList<TextPosition> = ArrayList()
