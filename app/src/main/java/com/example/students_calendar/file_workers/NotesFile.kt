@@ -96,12 +96,14 @@ class NotesFile {
     fun ReadNotesFromPDF(file: File, date: LocalDate, page:Int) : List<Note> {
         var a = PDFTableExtractor()
         a.setSource(file)
+        a.exceptLine(intArrayOf(0,1,2,3,4,5,6,-1,-2))
+        a.exceptColumn(intArrayOf(0))
         var table = a.extract(page)
 
-        var tableStr = ""
         var pair = 0
         var day = 0
         var i = 0
+
         while(i<table.rows.size)
         {
             table.rows[i].index=day
@@ -118,8 +120,6 @@ class NotesFile {
             pair++
         }
 
-        table.rows.removeAll { it.cells.size<2 }
-
         var NotesList:MutableList<Note> = parseTableToNotes(table, date);
 
         return NotesList
@@ -128,71 +128,69 @@ class NotesFile {
     private fun parseTableToNotes(table: Table, date: LocalDate): MutableList<Note> {
         var result = mutableListOf<Note>()
         var i =0
-        var bufTime :LocalTime? = null
-        while(i < table.rows.size-2)
+
+        var rows = table.rows
+
+        while(i < rows.size-2)
         {
             var note1:Note = Note("",NoteState.New,true)
             var note2:Note = Note("",NoteState.New,true)
-            var rowNames = table.rows[i].cells
-            var rowDescriptions = table.rows[i+1].cells
-            var timeStart:String=""
-            var timeEnd:String=""
+            var rowNames = rows[i].cells
 
-            if(rowNames[0].content.length<4){
-                var addictionRow = table.rows[i+2].cells
-                timeStart = rowDescriptions[0].content
-                timeEnd = addictionRow[0].content
-            }
-            else {
-                timeStart = rowNames[0].content.split(" ")[1]
-                timeEnd = rowDescriptions[0].content
-            }
-
-            var timeStartLocal = LocalTime.parse(timeStart, DateTimeFormatter.ofPattern("H:m"))
-            var timeEndLocal = LocalTime.parse(timeEnd, DateTimeFormatter.ofPattern("H:m"))
-
-            val dateToWork = date.plusDays(table.rows[i].index.toLong())
+            var noteTimeStart = i
 
             if(rowNames.size<2)
             {
-                i+=2
+                if(rowNames[0].content.contains(' '))
+                    i+=2
+                else
+                    i+=3
                 continue
             }
+
+            var timeStartLocal = LocalTime.parse("9:00", DateTimeFormatter.ofPattern("H:m"))
+            while(noteTimeStart<rows.size-2){
+                try{
+                    var timeStart = rows[noteTimeStart].cells[0].content
+                    if(timeStart.contains(' '))
+                        timeStart = timeStart.split(' ')[1]
+                    timeStartLocal = LocalTime.parse(timeStart, DateTimeFormatter.ofPattern("H:m"))
+                    break
+                }
+                catch(ex:Exception) {
+                    noteTimeStart++
+                }
+            }
+
+            var noteTimeEnd = noteTimeStart+1
+            var timeEndLocal = LocalTime.parse("9:00", DateTimeFormatter.ofPattern("H:m"))
+            while(noteTimeEnd<rows.size-2){
+                try{
+                    if(rows[noteTimeEnd].cells.size<2)
+                    {
+                        noteTimeEnd++
+                        continue
+                    }
+                    var timeEnd = rows[noteTimeEnd].cells[0].content
+                    if(timeEnd.contains(' '))
+                        timeEnd = timeEnd.split(' ')[1]
+                    timeEndLocal = LocalTime.parse(timeEnd, DateTimeFormatter.ofPattern("H:m"))
+                    break
+                }
+                catch(ex:Exception) {
+                    noteTimeEnd++
+                }
+            }
+
+            val dateToWork = date.plusDays(table.rows[i].index.toLong())
+
+            var rowDescriptions = rows[noteTimeEnd].cells
 
             note1.name= rowNames[1].content
             note1.description = rowDescriptions[1].content
             if(rowNames.size>2){
                 note2.name= rowNames[2].content
                 note2.description = rowDescriptions[2].content
-            }
-
-            if(rowNames[0].content.length<4)
-            {
-                var addictionRow = table.rows[i+2].cells
-
-                var addiction1 = addictionRow[1].content.split(" ")
-                var addiction2 = listOf<String>()
-                var resAddiction = "\n"
-                var j = 0
-                while(j < addiction1.size/2){
-                    resAddiction += addiction1[j]+" "+addiction1[j+addiction1.size/2]
-                    j++
-                }
-                note1.description+=resAddiction
-                resAddiction = "\n"
-                if(rowNames.size>2){
-                    addiction2 = addictionRow[2].content.split(" ")
-                    j = 0
-                    while(j < addiction2.size/2){
-                        resAddiction += addiction2[j]+" "+addiction2[j+addiction2.size/2] + when{
-                            j+1 < addiction2.size/2->" / "
-                            else ->""
-                        }
-                        j++
-                    }
-                }
-                note2.description+=resAddiction
-                i++
             }
 
             note1.startTime = timeStartLocal
@@ -207,8 +205,8 @@ class NotesFile {
 
             note1.isPeriodic = true
             note2.isPeriodic = true
-            note1.periodDays=14
-            note2.periodDays=14
+            note1.periodDays = 14
+            note2.periodDays = 14
 
             note1.isSchedule = true
             note2.isSchedule = true
@@ -217,7 +215,7 @@ class NotesFile {
                 result.add(note1)
             if(note2.name.length>1)
                 result.add(note2)
-            i+=2
+            i = noteTimeEnd+1
         }
         return result
     }

@@ -18,7 +18,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -31,7 +32,6 @@ android {
     }
 }
 dependencies {
-    implementation 'com.pspdfkit:pspdfkit:8.2.1'
     implementation 'com.github.hedzr:android-file-chooser:v1.2.0'
     implementation 'ru.tinkoff.decoro:decoro:1.1.1'
     implementation 'com.google.code.gson:gson:2.9.0'

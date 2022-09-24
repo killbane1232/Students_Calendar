@@ -9,11 +9,15 @@
 
     <!-- declare calendarIcon attribute -->
     <attr name="calendarIcon" format="reference"/>
+    <attr name="buttonShape" format="color"/>
+    <attr name="buttonColor" format="color"/>
 
     <!-- declare our custom widget to be styleable by these attributes -->
     <declare-styleable name="com.example.students_calendar">
         <attr name="calendarIcon" />
         <attr name="noteIcon" />
         <attr name="menuIcon" />
+        <attr name="buttonShape" />
+        <attr name="buttonColor" />
     </declare-styleable>
 </resources>

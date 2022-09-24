@@ -13,5 +13,8 @@
         <item name="calendarIcon">@drawable/ic_calendar_icon_white</item>
         <item name="noteIcon">@drawable/ic_note_icon_white</item>
         <item name="menuIcon">@drawable/ic_menu_icon_white</item>
+
+        <item name="buttonColor">#FFFFFF</item>
+        <item name="buttonShape">#000000</item>
     </style>
 </resources>

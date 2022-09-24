@@ -3,7 +3,6 @@ package com.example.students_calendar.Pdf
 import com.example.students_calendar.Pdf.data.Table
 import com.example.students_calendar.Pdf.data.TableCell
 import com.example.students_calendar.Pdf.data.TableRow
-import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.HashMultimap
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.LinkedListMultimap
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Multimap
 import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.collect.Range
@@ -20,7 +19,8 @@ class PDFTableExtractor() {
     private val extractedPages: MutableList<Int> = ArrayList()
     private val exceptedPages: MutableList<Int> = ArrayList()
 
-    private val pageNExceptedLinesMap: Multimap<Int, Int> = HashMultimap.create()
+    private val pageNExceptedLines: MutableList<Int> = mutableListOf()
+    private val pageNExceptedColumns: MutableList<Int> = mutableListOf()
     private var inputStream: InputStream? = null
     private var document: PDDocument? = null
     private var password: String? = null
@@ -36,38 +36,41 @@ class PDFTableExtractor() {
 
     fun extract(indx:Int): Table {
         val retVal: MutableList<Table> = ArrayList()
-        val pageIdNLineRangesMap: Multimap<Int, Range<Int>> = LinkedListMultimap.create()
-        val pageIdNTextsMap: Multimap<Int, TextPosition> = LinkedListMultimap.create()
+        val pageIdNLineRangesMap: MutableList<Range<Int>> = mutableListOf()
+        val pageIdNTextsMap: MutableList<TextPosition> = mutableListOf()
         val pageId = indx
         try {
             document =
                 if (password != null) PDDocument.load(inputStream, password) else PDDocument.load(
                     inputStream
                 )
-                val b =
-                    !exceptedPages.contains(pageId) && (extractedPages.isEmpty() || extractedPages.contains(
-                        pageId
-                    ))
-                if (b) {
+
                     val texts = extractTextPositions(pageId) //sorted by .getY() ASC
                     //extract line ranges
-                    val lineRanges: List<Range<Int>> = getLineRanges(pageId, texts)
+                    var lineRanges: List<Range<Int>> = getLineRanges(texts)
+                    var textsByLineRanges = getTextsByLineRanges(lineRanges, texts)
+
+                    var columnRanges: List<Range<Int>> = getColumnRanges(textsByLineRanges)
+                    var textsByColumnRanges = getTextsByColumnRanges(columnRanges, textsByLineRanges)
+
+                    lineRanges = getLineRanges2(textsByColumnRanges)
+                    textsByLineRanges = getTextsByLineRanges(lineRanges, textsByColumnRanges)
+                    columnRanges = getColumnRanges2(textsByLineRanges)
+
                     //extract column ranges
-                    val textsByLineRanges = getTextsByLineRanges(lineRanges, texts)
-                    pageIdNLineRangesMap.putAll(pageId, lineRanges)
-                    pageIdNTextsMap.putAll(pageId, textsByLineRanges)
-                }
+                    pageIdNLineRangesMap.addAll(lineRanges)
+                    pageIdNTextsMap.addAll(textsByLineRanges)
+
             //Calculate columnRanges
-            val columnRanges: List<Range<Int>> = getColumnRanges(pageIdNTextsMap.values())
-            for (pageId: Int in pageIdNTextsMap.keySet()) {
+
                 val table: Table = buildTable(
                     pageId,
-                    pageIdNTextsMap.get(pageId).toList(),
-                    pageIdNLineRangesMap.get(pageId).toList(),
+                    pageIdNTextsMap,
+                    pageIdNLineRangesMap,
                     columnRanges
                 )
                 retVal.add(table)
-            }
+
         } catch (ex: IOException) {
             throw RuntimeException("Parse pdf file fail", ex)
         } finally {
@@ -142,7 +145,13 @@ class PDFTableExtractor() {
                 cellContent.add(textPosition)
                 idx++
             } else {
-                val cell: TableCell = buildCell(columnIdx, cellContent)
+                var cell: TableCell
+                if(cellContent.size>0)
+                {
+                    cell = buildCell(columnIdx, cellContent)
+                }
+                else
+                    cell = TableCell(columnIdx, "")
                 retVal.cells.add(cell)
                 //next column: clear cell content
                 cellContent.clear()
@@ -192,9 +201,12 @@ class PDFTableExtractor() {
         return extractor.extract()
     }
 
-    private fun isExceptedLine(pageIdx: Int, lineIdx: Int): Boolean {
-        return (pageNExceptedLinesMap.containsEntry(pageIdx, lineIdx)
-                || pageNExceptedLinesMap.containsEntry(-1, lineIdx))
+    private fun isExceptedLine(lineIdx: Int, lineRangeSize: Int): Boolean {
+        return (pageNExceptedLines.contains(lineIdx) || pageNExceptedLines.contains(lineIdx-lineRangeSize))
+    }
+
+    private fun isExceptedColumn(columnIdx: Int, columnRangeSize: Int): Boolean {
+        return (pageNExceptedColumns.contains(columnIdx) || pageNExceptedColumns.contains(columnIdx-columnRangeSize))
     }
 
     private fun getTextsByLineRanges(
@@ -204,10 +216,36 @@ class PDFTableExtractor() {
         val retVal: MutableList<TextPosition> = ArrayList()
         var idx = 0
         var lineIdx = 0
-        while (idx < textPositions.size && lineIdx < lineRanges.size) {
-            val textPosition = textPositions[idx]
+        val texts = textPositions.sortedBy { it.y }
+        while (idx < texts.size && lineIdx < lineRanges.size) {
+            val textPosition = texts[idx]
             val textRange: Range<Int> =
                 Range.closed(textPosition.y.toInt(), (textPosition.y + textPosition.height).toInt())
+            val lineRange: Range<Int> = lineRanges[lineIdx]
+            if (lineRange.encloses(textRange)) {
+                retVal.add(textPosition)
+                idx++
+            } else if (lineRange.upperEndpoint() < textRange.lowerEndpoint()) {
+                lineIdx++
+            } else {
+                idx++
+            }
+        }
+        return retVal
+    }
+
+    private fun getTextsByColumnRanges(
+        lineRanges: List<Range<Int>>,
+        textPositions: List<TextPosition>
+    ): List<TextPosition> {
+        val retVal: MutableList<TextPosition> = ArrayList()
+        var idx = 0
+        var lineIdx = 0
+        val texts = textPositions.sortedBy { it.x }
+        while (idx < texts.size && lineIdx < lineRanges.size) {
+            val textPosition = texts[idx]
+            val textRange: Range<Int> =
+                Range.closed(textPosition.x.toInt(), (textPosition.x + textPosition.height).toInt())
             val lineRange: Range<Int> = lineRanges[lineIdx]
             if (lineRange.encloses(textRange)) {
                 retVal.add(textPosition)
@@ -227,11 +265,10 @@ class PDFTableExtractor() {
             val range: Range<Int> = Range.closed(text.x.toInt()-1, (text.x + text.width).toInt()+1)
             rangesBuilder.addRange(range)
         }
-        return rangesBuilder.build()
+        return removeExceptedColumns(rangesBuilder.build())
     }
 
     private fun getLineRanges(
-        pageId: Int,
         pageContent: List<TextPosition>
     ): List<Range<Int>> {
         val lineTrapRangeBuilder = TrapRangeBuilder()
@@ -245,22 +282,73 @@ class PDFTableExtractor() {
         }
         val lineTrapRanges: List<Range<Int>> =
             lineTrapRangeBuilder.build()
-        return removeExceptedLines(pageId, lineTrapRanges)
+        return removeExceptedLines(lineTrapRanges)
+    }
+
+    private fun getColumnRanges2(texts: Collection<TextPosition>): List<Range<Int>> {
+        val rangesBuilder = TrapRangeBuilder()
+        for (text: TextPosition in texts) {
+            val range: Range<Int> = Range.closed(text.x.toInt()-1, (text.x + text.width).toInt()+1)
+            rangesBuilder.addRange(range)
+        }
+        return rangesBuilder.build()
+    }
+
+    private fun getLineRanges2(
+        pageContent: List<TextPosition>
+    ): List<Range<Int>> {
+        val lineTrapRangeBuilder = TrapRangeBuilder()
+        for (textPosition: TextPosition in pageContent) {
+            val lineRange: Range<Int> = Range.closed(
+                textPosition.y.toInt(),
+                (textPosition.y + textPosition.height).toInt()
+            )
+            //add to builder
+            lineTrapRangeBuilder.addRange(lineRange)
+        }
+        val lineTrapRanges: List<Range<Int>> =
+            lineTrapRangeBuilder.build()
+        return lineTrapRanges
     }
 
     private fun removeExceptedLines(
-        pageIdx: Int,
         lineTrapRanges: List<Range<Int>>
     ): List<Range<Int>> {
         val retVal: MutableList<Range<Int>> = ArrayList()
         for (lineIdx in lineTrapRanges.indices) {
-            val isExceptedLine = (isExceptedLine(pageIdx, lineIdx)
-                    || isExceptedLine(pageIdx, lineIdx - lineTrapRanges.size))
+            val isExceptedLine = isExceptedLine(lineIdx, lineTrapRanges.size)
             if (!isExceptedLine) {
                 retVal.add(lineTrapRanges[lineIdx])
             }
         }
         return retVal
+    }
+
+    private fun removeExceptedColumns(
+        columnTrapRanges: List<Range<Int>>
+    ): List<Range<Int>> {
+        val retVal: MutableList<Range<Int>> = ArrayList()
+        for (lineIdx in columnTrapRanges.indices) {
+            val isExceptedColumn = isExceptedColumn(lineIdx, columnTrapRanges.size)
+            if (!isExceptedColumn) {
+                retVal.add(columnTrapRanges[lineIdx])
+            }
+        }
+        return retVal
+    }
+
+    fun exceptLine(lineIdxes: IntArray): PDFTableExtractor {
+        for (lineIdx: Int in lineIdxes) {
+            pageNExceptedLines.add(lineIdx)
+        }
+        return this
+    }
+
+    fun exceptColumn(lineIdxes: IntArray): PDFTableExtractor {
+        for (lineIdx: Int in lineIdxes) {
+            pageNExceptedColumns.add(lineIdx)
+        }
+        return this
     }
 
     private class TextPositionExtractor(document: PDDocument?, pageId: Int) :
@@ -284,12 +372,6 @@ class PDFTableExtractor() {
             this.textPositions.addAll(textPositions)
         }
 
-        /**
-         * and order by textPosition.getY() ASC
-         *
-         * @return
-         * @throws IOException
-         */
         @Throws(IOException::class)
         fun extract(): List<TextPosition> {
             stripPage(pageId)
@@ -301,11 +383,11 @@ class PDFTableExtractor() {
                     else -> 0
                 }
             }
-            textPositions.removeAll {
+            /*textPositions.removeAll {
                 it.x == 16.321081f ||
                         it.y<=146.04004||
                         it.y>=814.55993
-            }
+            }*/
             return textPositions
         }
 
