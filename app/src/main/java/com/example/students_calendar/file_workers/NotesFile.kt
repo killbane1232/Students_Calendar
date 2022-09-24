@@ -9,8 +9,7 @@ import com.example.students_calendar.R
 import com.example.students_calendar.data.Note
 import com.example.students_calendar.data.NoteState
 import com.example.students_calendar.dialogs.NumeratorDialog
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import java.io.*
 import java.lang.reflect.Type
@@ -32,7 +31,12 @@ class NotesFile {
     public fun WriteNotes(notesList: List<Note>)
     {
         var fos: FileOutputStream? = null
-        val text = Gson().toJson(notesList)
+        val text = GsonBuilder()
+            .setLenient()
+            .registerTypeAdapter(object : TypeToken<LocalDate>(){}.type, LocalDateConverter())
+            .registerTypeAdapter(object : TypeToken<LocalTime>(){}.type, LocalTimeConverter())
+            .create()
+            .toJson(notesList)
         try {
             fos = context.openFileOutput(FILE_NAME, AppCompatActivity.MODE_PRIVATE)
 
@@ -57,6 +61,8 @@ class NotesFile {
             val listType: Type = object : TypeToken<ArrayList<Note>>() {}.type
             NotesList = GsonBuilder()
                 .setLenient()
+                .registerTypeAdapter(object : TypeToken<LocalDate>(){}.type, LocalDateConverter())
+                .registerTypeAdapter(object : TypeToken<LocalTime>(){}.type, LocalTimeConverter())
                 .create()
                 .fromJson(fis.reader(), listType)
         } catch (ex: Exception) {
@@ -80,6 +86,8 @@ class NotesFile {
             val listType: Type = object : TypeToken<List<Note>>() {}.type
             NotesList = GsonBuilder()
                 .setLenient()
+                .registerTypeAdapter(object : TypeToken<LocalDate>(){}.type, LocalDateConverter())
+                .registerTypeAdapter(object : TypeToken<LocalTime>(){}.type, LocalTimeConverter())
                 .create()
                 .fromJson(reader, listType)
         } catch (ex: Exception) {
@@ -218,5 +226,45 @@ class NotesFile {
             i = noteTimeEnd+1
         }
         return result
+    }
+
+    class LocalDateConverter : JsonSerializer<LocalDate?>,
+        JsonDeserializer<LocalDate?> {
+        override fun serialize(
+            src: LocalDate?,
+            typeOfSrc: Type?,
+            context: JsonSerializationContext?
+        ): JsonElement {
+            return JsonPrimitive(DateTimeFormatter.ISO_LOCAL_DATE.format(src))
+        }
+
+        @Throws(JsonParseException::class)
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type?,
+            context: JsonDeserializationContext?
+        ): LocalDate {
+            return DateTimeFormatter.ISO_LOCAL_DATE.parse(json.asString, LocalDate::from)
+        }
+    }
+
+    class LocalTimeConverter : JsonSerializer<LocalTime?>,
+        JsonDeserializer<LocalTime?> {
+        override fun serialize(
+            src: LocalTime?,
+            typeOfSrc: Type?,
+            context: JsonSerializationContext?
+        ): JsonElement {
+            return JsonPrimitive(DateTimeFormatter.ISO_LOCAL_TIME.format(src))
+        }
+
+        @Throws(JsonParseException::class)
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type?,
+            context: JsonDeserializationContext?
+        ): LocalTime {
+            return DateTimeFormatter.ISO_LOCAL_TIME.parse(json.asString, LocalTime::from)
+        }
     }
 }
