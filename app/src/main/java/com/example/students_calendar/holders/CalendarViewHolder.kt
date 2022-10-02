@@ -1,23 +1,20 @@
-package com.example.students_calendar.holders;
+package com.example.students_calendar.holders
 
 import android.view.View
 import android.widget.TextView
-
-import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
 import com.example.students_calendar.R
 import com.example.students_calendar.adapters.CalendarAdapter
 
-public class CalendarViewHolder : RecyclerView.ViewHolder, View.OnClickListener {
+class CalendarViewHolder(
+    itemView: View,
+    private val onItemListener: CalendarAdapter.OnItemListener
+) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
-    var dayOfMonthText:TextView;
-    var ItemView:View
-    val onItemListener: CalendarAdapter.OnItemListener
+    var dayOfMonthText:TextView
 
-    constructor(@NonNull itemView: View, onItemListener: CalendarAdapter.OnItemListener) : super(itemView) {
+    init {
         dayOfMonthText = itemView.findViewById(R.id.cellDayTV)
-        ItemView = itemView
-        this.onItemListener = onItemListener
         itemView.setOnClickListener(this)
     }
 

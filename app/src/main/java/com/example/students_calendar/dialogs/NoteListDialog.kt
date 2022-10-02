@@ -9,13 +9,7 @@ import com.example.students_calendar.R
 import com.example.students_calendar.adapters.NoteAdapter
 import com.example.students_calendar.data.Note
 
-class NoteListDialog {
-    val parent:AppCompatActivity
-
-    constructor(parent:AppCompatActivity)
-    {
-        this.parent = parent
-    }
+class NoteListDialog(val parent: AppCompatActivity) {
 
     fun createDialog(title:String, noteList:MutableList<Note>, listener:NoteAdapter.OnItemListener):AlertDialog
     {
@@ -32,7 +26,7 @@ class NoteListDialog {
             .setView(customView)
             .setCancelable(false)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                Toast.makeText(parent,"УРА", Toast.LENGTH_LONG)
+                Toast.makeText(parent,"Заметка создана", Toast.LENGTH_LONG).show()
             }).show()
     }
 }

@@ -1,5 +1,6 @@
 package com.example.students_calendar.activities
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -62,7 +63,7 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
 
         val fileReader = NotesFile(this)
 
-        var notes = fileReader.ReadNotes()
+        var notes = fileReader.readNotes()
 
         NotesList.addAll(notes)
 
@@ -71,6 +72,7 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
         Adapter = adapter
     }
 
+    @SuppressLint("CutPasteId")
     fun addNoteAction(view: View) {
         val customView = layoutInflater.inflate(R.layout.dialog_create_note, null)
         val beginDateButton = customView.findViewById<Button>(R.id.numeratorDate)
@@ -131,7 +133,7 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
             if(beginDate!=null)
                 dateSetter.set(beginDate!!.year,beginDate!!.monthValue-1,beginDate!!.dayOfMonth)
             val d =
-                DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                     dateSetter.set(Calendar.YEAR, year)
                     dateSetter.set(Calendar.MONTH, monthOfYear)
                     dateSetter.set(Calendar.DAY_OF_MONTH, dayOfMonth)
@@ -155,7 +157,7 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
             if(endDate!=null)
                 dateSetter.set(endDate!!.year,endDate!!.monthValue-1,endDate!!.dayOfMonth)
             val d =
-                DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                     dateSetter.set(Calendar.YEAR, year)
                     dateSetter.set(Calendar.MONTH, monthOfYear)
                     dateSetter.set(Calendar.DAY_OF_MONTH, dayOfMonth)
@@ -176,8 +178,8 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
         }
         beginTimeButton.setOnClickListener{
             val timeSetter = Calendar.getInstance()
-            var t =
-                TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+            val t =
+                TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
                     timeSetter.set(Calendar.HOUR_OF_DAY, hourOfDay)
                     timeSetter.set(Calendar.MINUTE, minute)
                     beginTime = LocalTime.of(hourOfDay, minute)
@@ -196,8 +198,8 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
         }
         endTimeButton.setOnClickListener{
             val timeSetter = Calendar.getInstance()
-            var t =
-                TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+            val t =
+                TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
                     timeSetter.set(Calendar.HOUR_OF_DAY, hourOfDay)
                     timeSetter.set(Calendar.MINUTE, minute)
                     endTime = LocalTime.of(hourOfDay, minute)
@@ -223,11 +225,11 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
 
             }
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                var view = customView.findViewById<TextInputEditText>(R.id.NoteNameInput)
-                val name = view.text
+                var textView = customView.findViewById<TextInputEditText>(R.id.NoteNameInput)
+                val name = textView.text
                 val newNote = Note(name.toString(), NoteState.New, checkBoxPeriodic.isChecked)
-                view = customView.findViewById(R.id.NoteDescriptionInput)
-                val description = view.text
+                textView = customView.findViewById(R.id.NoteDescriptionInput)
+                val description = textView.text
                 newNote.description = description.toString()
                 NotesList.add(newNote)
                 Adapter.notifyItemInserted(NotesList.size-1)
@@ -244,10 +246,10 @@ class NotesActivity : AppCompatActivity(),NoteAdapter.OnItemListener {
                 if(checkBoxPeriodic.isChecked)
                 {
                     newNote.isPeriodic = true
-                    view = customView.findViewById(R.id.periodDaysText)
-                    newNote.periodDays = view.text.toString().toInt()
+                    textView = customView.findViewById(R.id.periodDaysText)
+                    newNote.periodDays = textView.text.toString().toInt()
                 }
-                NotesFile(this).WriteNotes(NotesList)
+                NotesFile(this).writeNotes(NotesList)
             }.show()
     }
     fun calendarAction(view: View) {

@@ -1,3 +1,3 @@
-package com.example.students_calendar.Pdf.data
+package com.example.students_calendar.pdf.data
 
-class TableCell(val idx: Int, val content: String)
+class TableCell(val content: String)

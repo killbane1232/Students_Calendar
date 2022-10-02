@@ -7,13 +7,8 @@ import com.example.students_calendar.file_workers.NotesFile
 import com.obsez.android.lib.filechooser.ChooserDialog
 import java.io.IOException
 
-class FileChooserDialog {
-    val parent: AppCompatActivity
+class FileChooserDialog(val parent: AppCompatActivity) {
 
-    constructor(parent: AppCompatActivity)
-    {
-        this.parent = parent
-    }
     fun showDialog(suffix:String) {
         ChooserDialog(parent)
             .withFilter(false, false, suffix)
@@ -24,17 +19,16 @@ class FileChooserDialog {
                     return@withChosenListener
                 }
                 val notesFile = NotesFile(parent)
-                var notes: MutableList<Note>
-                try {
-                    notes = notesFile.ReadNotes().toMutableList()
+                val notes: MutableList<Note> = try {
+                    notesFile.readNotes().toMutableList()
                 } catch (ex: IOException) {
-                    notes = mutableListOf()
+                    mutableListOf()
                 }
-                var newNotes: List<Note>
+                val newNotes: List<Note>
                 try {
-                    newNotes = notesFile.ReadNotes(file)
+                    newNotes = notesFile.readNotes(file)
                     newNotes.forEach {
-                        var note = notes.find{ x-> (x.name == it.name) }
+                        val note = notes.find{ x-> (x.name == it.name) }
                         if (note == null) {
                             notes.add(it)
                         } else
@@ -47,9 +41,9 @@ class FileChooserDialog {
                                 it.periodDays != note.periodDays)
                                 notes.add(it)
                     }
-                    notesFile.WriteNotes(notes)
+                    notesFile.writeNotes(notes)
                 } catch (ex: Exception) {
-                    Toast.makeText(parent, ex.message, Toast.LENGTH_LONG)
+                    Toast.makeText(parent, ex.message, Toast.LENGTH_LONG).show()
                 }
             }
             .build()

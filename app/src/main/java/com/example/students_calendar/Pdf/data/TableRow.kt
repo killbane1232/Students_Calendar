@@ -1,25 +1,6 @@
-package com.example.students_calendar.Pdf.data
+package com.example.students_calendar.pdf.data
 
-
-
-class TableRow(val idx: Int) {
+class TableRow() {
     val cells: MutableList<TableCell> = ArrayList()
-    var index:Int = 0
-
-    override fun toString(): String {
-        val retVal = StringBuilder()
-        var lastCellIdx = 0
-        for (cell in cells) {
-            for (idx2 in lastCellIdx until cell.idx - 1) {
-                retVal.append(";")
-            }
-            if (cell.idx > 0) {
-                retVal.append(";")
-            }
-            retVal.append(cell.content)
-            lastCellIdx = cell.idx
-        }
-        //return
-        return retVal.toString()
-    }
+    var dayIndex:Int = 0
 }

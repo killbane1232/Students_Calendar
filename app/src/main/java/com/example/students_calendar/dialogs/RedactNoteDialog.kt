@@ -51,7 +51,7 @@ class RedactNoteDialog {
         initObservers()
         prepareUI()
 
-        val note = adapter.NotesList.get(position)
+        val note = adapter.notesList.get(position)
 
         val nameView = customView.findViewById<TextInputEditText>(R.id.NoteNameInput)
         nameView.setText(note.name)
@@ -113,7 +113,7 @@ class RedactNoteDialog {
                     note.periodDays = periodDate.text.toString().toInt()
                 }
                 adapter.notifyItemChanged(position)
-                NotesFile(parent).WriteNotes(adapter.NotesList)
+                NotesFile(parent).writeNotes(adapter.notesList)
             }.show()
     }
 

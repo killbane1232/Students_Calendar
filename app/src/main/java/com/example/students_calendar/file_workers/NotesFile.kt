@@ -1,6 +1,5 @@
 package com.example.students_calendar.file_workers
 
-import android.content.Context
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.students_calendar.Pdf.PDFTableExtractor
@@ -8,7 +7,6 @@ import com.example.students_calendar.Pdf.data.Table
 import com.example.students_calendar.R
 import com.example.students_calendar.data.Note
 import com.example.students_calendar.data.NoteState
-import com.example.students_calendar.dialogs.NumeratorDialog
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import java.io.*
@@ -18,27 +16,20 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 
-class NotesFile {
-    val context:AppCompatActivity
-    private var FILE_NAME:String
+class NotesFile(_context: AppCompatActivity) {
+    val context: AppCompatActivity = _context
+    private var fileName: String = context.resources.getString(R.string.notes_file)
 
-    constructor(_context: AppCompatActivity)
-    {
-        this.context = _context
-        FILE_NAME =context.resources.getString(R.string.notes_file)
-    }
-
-    public fun WriteNotes(notesList: List<Note>)
-    {
+    fun writeNotes(notesList: List<Note>) {
         var fos: FileOutputStream? = null
         val text = GsonBuilder()
             .setLenient()
-            .registerTypeAdapter(object : TypeToken<LocalDate>(){}.type, LocalDateConverter())
-            .registerTypeAdapter(object : TypeToken<LocalTime>(){}.type, LocalTimeConverter())
+            .registerTypeAdapter(object : TypeToken<LocalDate>() {}.type, LocalDateConverter())
+            .registerTypeAdapter(object : TypeToken<LocalTime>() {}.type, LocalTimeConverter())
             .create()
             .toJson(notesList)
         try {
-            fos = context.openFileOutput(FILE_NAME, AppCompatActivity.MODE_PRIVATE)
+            fos = context.openFileOutput(fileName, AppCompatActivity.MODE_PRIVATE)
 
             fos.write(text.toByteArray())
         } catch (ex: IOException) {
@@ -52,22 +43,21 @@ class NotesFile {
         }
     }
 
-    public fun ReadNotes() : List<Note>
-    {
-        var NotesList = listOf<Note>()
+    fun readNotes(): List<Note> {
+        var notesList = listOf<Note>()
         var fis: FileInputStream? = null
         try {
-            fis = context.openFileInput(FILE_NAME)
+            fis = context.openFileInput(fileName)
             val listType: Type = object : TypeToken<ArrayList<Note>>() {}.type
-            NotesList = GsonBuilder()
+            notesList = GsonBuilder()
                 .setLenient()
-                .registerTypeAdapter(object : TypeToken<LocalDate>(){}.type, LocalDateConverter())
-                .registerTypeAdapter(object : TypeToken<LocalTime>(){}.type, LocalTimeConverter())
+                .registerTypeAdapter(object : TypeToken<LocalDate>() {}.type, LocalDateConverter())
+                .registerTypeAdapter(object : TypeToken<LocalTime>() {}.type, LocalTimeConverter())
                 .create()
                 .fromJson(fis.reader(), listType)
         } catch (ex: Exception) {
-            if(!File(FILE_NAME).exists())
-                WriteNotes(NotesList)
+            if (!File(fileName).exists())
+                writeNotes(notesList)
             Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
         } finally {
             try {
@@ -76,18 +66,19 @@ class NotesFile {
                 Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
             }
         }
-        return NotesList
+        return notesList
     }
-    public fun ReadNotes(file: File) : List<Note> {
-        var NotesList = listOf<Note>()
-        var reader:InputStreamReader?=null
+
+    fun readNotes(file: File): List<Note> {
+        var notesList = listOf<Note>()
+        var reader: InputStreamReader? = null
         try {
             reader = file.reader()
             val listType: Type = object : TypeToken<List<Note>>() {}.type
-            NotesList = GsonBuilder()
+            notesList = GsonBuilder()
                 .setLenient()
-                .registerTypeAdapter(object : TypeToken<LocalDate>(){}.type, LocalDateConverter())
-                .registerTypeAdapter(object : TypeToken<LocalTime>(){}.type, LocalTimeConverter())
+                .registerTypeAdapter(object : TypeToken<LocalDate>() {}.type, LocalDateConverter())
+                .registerTypeAdapter(object : TypeToken<LocalTime>() {}.type, LocalTimeConverter())
                 .create()
                 .fromJson(reader, listType)
         } catch (ex: Exception) {
@@ -99,105 +90,96 @@ class NotesFile {
                 Toast.makeText(context, ex.message, Toast.LENGTH_SHORT).show()
             }
         }
-        return NotesList
+        return notesList
     }
-    fun ReadNotesFromPDF(file: File, date: LocalDate, page:Int) : List<Note> {
-        var a = PDFTableExtractor()
+
+    fun readNotesFromPDF(file: File, date: LocalDate, page: Int): List<Note> {
+        val a = PDFTableExtractor()
         a.setSource(file)
-        a.exceptLine(intArrayOf(0,1,2,3,4,5,6,-1,-2))
+        a.exceptLine(intArrayOf(0, 1, 2, 3, 4, 5, 6, -1, -2))
         a.exceptColumn(intArrayOf(0))
-        var table = a.extract(page)
+        val table = a.extract(page)
 
         var pair = 0
         var day = 0
         var i = 0
 
-        while(i<table.rows.size)
-        {
-            table.rows[i].index=day
-            if(table.rows[i].cells[0].content.length<4)
-            {
-                i+=3
-            }
-            else
-                i+=2
-            if(pair>=5){
+        while (i < table.rows.size) {
+            table.rows[i].dayIndex = day
+            i += if (table.rows[i].cells[0].content.length < 4) {
+                3
+            } else
+                2
+            if (pair >= 5) {
                 pair = -1
                 day++
             }
             pair++
         }
 
-        var NotesList:MutableList<Note> = parseTableToNotes(table, date);
-
-        return NotesList
+        return parseTableToNotes(table, date)
     }
 
     private fun parseTableToNotes(table: Table, date: LocalDate): MutableList<Note> {
-        var result = mutableListOf<Note>()
-        var i =0
+        val result = mutableListOf<Note>()
+        var i = 0
 
-        var rows = table.rows
+        val rows = table.rows
 
-        while(i < rows.size-2)
-        {
-            var note1:Note = Note("",NoteState.New,true)
-            var note2:Note = Note("",NoteState.New,true)
-            var rowNames = rows[i].cells
+        while (i < rows.size - 2) {
+            val note1 = Note("", NoteState.New, true)
+            val note2 = Note("", NoteState.New, true)
+            val rowNames = rows[i].cells
 
             var noteTimeStart = i
 
-            if(rowNames.size<2)
-            {
-                if(rowNames[0].content.contains(' '))
-                    i+=2
+            if (rowNames.size < 2) {
+                i += if (rowNames[0].content.contains(' '))
+                    2
                 else
-                    i+=3
+                    3
                 continue
             }
 
             var timeStartLocal = LocalTime.parse("9:00", DateTimeFormatter.ofPattern("H:m"))
-            while(noteTimeStart<rows.size-2){
-                try{
+            while (noteTimeStart < rows.size - 2) {
+                try {
                     var timeStart = rows[noteTimeStart].cells[0].content
-                    if(timeStart.contains(' '))
+                    if (timeStart.contains(' '))
                         timeStart = timeStart.split(' ')[1]
                     timeStartLocal = LocalTime.parse(timeStart, DateTimeFormatter.ofPattern("H:m"))
                     break
-                }
-                catch(ex:Exception) {
+                } catch (ex: Exception) {
                     noteTimeStart++
                 }
             }
 
-            var noteTimeEnd = noteTimeStart+1
+            var noteTimeEnd = noteTimeStart + 1
             var timeEndLocal = LocalTime.parse("9:00", DateTimeFormatter.ofPattern("H:m"))
-            while(noteTimeEnd<rows.size-2){
-                try{
-                    if(rows[noteTimeEnd].cells.size<2)
-                    {
+            while (noteTimeEnd < rows.size - 2) {
+                try {
+                    if (rows[noteTimeEnd].cells.size < 2) {
                         noteTimeEnd++
                         continue
                     }
                     var timeEnd = rows[noteTimeEnd].cells[0].content
-                    if(timeEnd.contains(' '))
+                    if (timeEnd.contains(' '))
                         timeEnd = timeEnd.split(' ')[1]
                     timeEndLocal = LocalTime.parse(timeEnd, DateTimeFormatter.ofPattern("H:m"))
                     break
-                }
-                catch(ex:Exception) {
+                } catch (ex: Exception) {
                     noteTimeEnd++
                 }
             }
 
-            val dateToWork = date.plusDays(table.rows[i].index.toLong())
+            val dateToWork = date.plusDays(table.rows[i].dayIndex.toLong())
 
-            var rowDescriptions = rows[noteTimeEnd].cells
+            val rowDescriptions = rows[noteTimeEnd].cells
 
-            note1.name= rowNames[1].content
+            note1.name = rowNames[1].content
             note1.description = rowDescriptions[1].content
-            if(rowNames.size>2){
-                note2.name= rowNames[2].content
+            if (rowNames.size > 2) {
+                note2.name = rowNames[2].content
                 note2.description = rowDescriptions[2].content
             }
 
@@ -219,11 +201,11 @@ class NotesFile {
             note1.isSchedule = true
             note2.isSchedule = true
 
-            if(note1.name.length>1)
+            if (note1.name.length > 1)
                 result.add(note1)
-            if(note2.name.length>1)
+            if (note2.name.length > 1)
                 result.add(note2)
-            i = noteTimeEnd+1
+            i = noteTimeEnd + 1
         }
         return result
     }

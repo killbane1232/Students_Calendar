@@ -8,25 +8,20 @@ import com.example.students_calendar.R
 import com.example.students_calendar.data.Note
 import com.example.students_calendar.holders.NoteHolder
 
-class NoteAdapter : RecyclerView.Adapter<NoteHolder> {
-    var NotesList:MutableList<Note>
-    var listener : NoteAdapter.OnItemListener
-
-    constructor(noteList:MutableList<Note>, onItemListener: NoteAdapter.OnItemListener)
-    {
-        this.NotesList = noteList
-        this.listener = onItemListener
-    }
+class NoteAdapter(noteList: MutableList<Note>, onItemListener: OnItemListener) :
+    RecyclerView.Adapter<NoteHolder>() {
+    var notesList:MutableList<Note> = noteList
+    var listener : OnItemListener = onItemListener
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteHolder {
-        var inflater = LayoutInflater.from(parent.context)
-        var view = inflater.inflate(R.layout.note_line,parent,false)
+        val inflater = LayoutInflater.from(parent.context)
+        val view = inflater.inflate(R.layout.note_line,parent,false)
 
         return  NoteHolder(view, listener)
     }
 
     override fun onBindViewHolder(holder: NoteHolder, position: Int) {
-        val note = NotesList.get(position)
+        val note = notesList[position]
         holder.noteNameText.text = note.name
         holder.noteDescriptionText.text = note.description
         holder.noteStartTimeText.visibility = View.GONE
@@ -44,7 +39,7 @@ class NoteAdapter : RecyclerView.Adapter<NoteHolder> {
     }
 
     override fun getItemCount(): Int {
-        return NotesList.size
+        return notesList.size
     }
 
     interface OnItemListener

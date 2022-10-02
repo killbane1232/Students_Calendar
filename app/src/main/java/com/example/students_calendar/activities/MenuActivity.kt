@@ -34,7 +34,6 @@ class MenuActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
@@ -100,9 +99,9 @@ class MenuActivity : AppCompatActivity() {
         try{
             val file = NotesFile(this)
             var notes = mutableListOf<Note>()
-            notes.addAll(file.ReadNotes())
+            notes.addAll(file.readNotes())
             notes.removeAll { it.isSchedule }
-            file.WriteNotes(notes)
+            file.writeNotes(notes)
         }
         catch (ex: IOException) {
             Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()

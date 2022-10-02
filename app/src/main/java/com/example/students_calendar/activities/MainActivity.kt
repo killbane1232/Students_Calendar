@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
     private lateinit var monthText:TextView
     private lateinit var calendarView:RecyclerView
     private lateinit var selectedDate:LocalDate
-    private var adapter:NoteAdapter?=null
 
     companion object {
         fun getInstance(
@@ -36,35 +35,29 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         initWidgets()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            selectedDate = LocalDate.now()
-        }
+
+        selectedDate = LocalDate.now()
+
         setMonthView()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun setMonthView() {
         monthText.text = monthFromDate(selectedDate)
         val pair = daysInMonthArray(selectedDate)
         val array = pair.first
-        val index = pair.second
-
 
         val adapter = CalendarAdapter(array,this, this)
         val layoutManger = GridLayoutManager(applicationContext,7)
-        //var decor = RecyclerView.ItemDecoration()
-        //calendarView.addItemDecoration()
+
         calendarView.layoutManager = layoutManger
         calendarView.adapter = adapter
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun daysInMonthArray(selectedDate: LocalDate): Pair<ArrayList<String>,Int> {
         val days = ArrayList<String>()
         val yearMonth = YearMonth.from(selectedDate)
@@ -72,7 +65,7 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
         val firstOfMonth = selectedDate.withDayOfMonth(1)
         val dayOfWeek = firstOfMonth.dayOfWeek.value-1
         var dateToday = -1
-        var localDateNow = LocalDate.now()
+        val localDateNow = LocalDate.now()
 
         for(i in 1..42)
         {
@@ -91,7 +84,6 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
         return Pair(days,dateToday)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun monthFromDate(date: LocalDate):String
     {
         val formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
@@ -103,36 +95,37 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
         monthText = findViewById(R.id.monthTV)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onItemClick(position: Int, dayText: String) {
-        if(dayText.equals(""))
+        if(dayText.isBlank())
             return
 
         val notesFile = NotesFile(this)
 
-        val NotesList = notesFile.ReadNotes()
+        val notesList = notesFile.readNotes()
 
-        val DayClicked:LocalDate
+        val dayClicked:LocalDate
         val dayOfMonth = dayText.toInt()
         var daysDif = (selectedDate.dayOfMonth-dayOfMonth).toLong()
-        if(selectedDate.dayOfMonth>dayOfMonth)
-            DayClicked = selectedDate.minusDays(daysDif)
+
+        dayClicked = if(selectedDate.dayOfMonth>dayOfMonth)
+            selectedDate.minusDays(daysDif)
         else
-            DayClicked = selectedDate.plusDays(-daysDif)
-        val epoch = DayClicked.toEpochDay()
+            selectedDate.plusDays(-daysDif)
+
+        val epoch = dayClicked.toEpochDay()
         val listToUse = mutableListOf<Note>()
-        NotesList.forEach {
-            var x = it
+        notesList.forEach {
+            val x = it
             if(x.startDate==null || x.endDate==null)
                 return@forEach
 
             var daysPeriod = false
             if(x.isPeriodic)
             {
-                var difference = epoch - x.startDate!!.toEpochDay()-((epoch - x.startDate!!.toEpochDay()) % x.periodDays!!)
-                var start = x.startDate!!.toEpochDay()+difference
-                var end = x.endDate!!.toEpochDay()+difference
-                daysPeriod = start<=epoch && end>=epoch ||
+                val difference = epoch - x.startDate!!.toEpochDay()-((epoch - x.startDate!!.toEpochDay()) % x.periodDays!!)
+                val start = x.startDate!!.toEpochDay()+difference
+                val end = x.endDate!!.toEpochDay()+difference
+                daysPeriod = epoch in start..end ||
                         start-x.periodDays!!<=epoch && end-x.periodDays!!>=epoch ||
                         start+x.periodDays!!<=epoch && end+x.periodDays!!>=epoch
             }
@@ -142,15 +135,14 @@ class MainActivity : AppCompatActivity(), CalendarAdapter.OnItemListener, NoteAd
                 listToUse.add(x)
         }
 
-        NoteListDialog(this).createDialog("Заметки на "+DayClicked.toString(), listToUse, this)
+        NoteListDialog(this).createDialog("Заметки на "+dayClicked.toString(), listToUse, this)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun previousMonthAction(view: View) {
         selectedDate = selectedDate.minusMonths(1)
         setMonthView()
     }
-    @RequiresApi(Build.VERSION_CODES.O)
+
     fun nextMonthAction(view: View) {
         selectedDate = selectedDate.plusMonths(1)
         setMonthView()
