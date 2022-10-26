@@ -1,14 +1,17 @@
-package com.example.students_calendar.activities;
+package com.example.students_calendar.activities
 
+import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.students_calendar.R
@@ -24,7 +27,7 @@ import java.io.IOException
 
 class MenuActivity : AppCompatActivity() {
 
-    lateinit var FILE_NAME:String
+    lateinit var fileName:String
 
     companion object {
         fun getInstance(
@@ -42,15 +45,15 @@ class MenuActivity : AppCompatActivity() {
     }
 
     private fun initWidgets() {
-        FILE_NAME=resources.getString(R.string.notes_file)
+        fileName=resources.getString(R.string.notes_file)
     }
 
     fun ExportNotes(view: View) {
         var fis: FileInputStream? = null
-        val FILE_NAME = resources.getString(R.string.notes_file)
+        val fileName = resources.getString(R.string.notes_file)
         try {
-            fis = openFileInput(FILE_NAME)
-            val file = File(getExternalFilesDir(Environment.DIRECTORY_DCIM),FILE_NAME)
+            fis = openFileInput(fileName)
+            val file = File(getExternalFilesDir(Environment.DIRECTORY_DCIM),fileName)
             if(file.exists())
                 file.delete()
             file.createNewFile()
@@ -82,7 +85,7 @@ class MenuActivity : AppCompatActivity() {
         }
     }
     fun ImportNotesPDF(view: View) {
-        if (ActivityCompat.checkSelfPermission(
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ActivityCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
@@ -90,9 +93,30 @@ class MenuActivity : AppCompatActivity() {
                 arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
                 LaunchActivityResult.permissions
             )
+        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()){
+            requestPermissions(this)
         } else {
-            PDFBoxResourceLoader.init(getApplicationContext())
+            PDFBoxResourceLoader.init(applicationContext)
             FileChooserDialog(this).showDialog("pdf")
+        }
+    }
+    fun requestPermissions(activity: Activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.addCategory("android.intent.category.DEFAULT")
+                intent.data = Uri.parse(String.format("package:%s", activity.packageName))
+                activity.startActivityForResult(intent, 101)
+            } catch (e: java.lang.Exception) {
+                val intent = Intent()
+                intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+                activity.startActivityForResult(intent, 101)
+            }
+        } else {
+            ActivityCompat.requestPermissions(
+                activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                101
+            )
         }
     }
     fun WipeShedule(view: View) {
@@ -109,7 +133,7 @@ class MenuActivity : AppCompatActivity() {
     }
     fun WipeNotes(view: View) {
         try{
-            deleteFile(FILE_NAME)
+            deleteFile(fileName)
         }
         catch (ex: IOException) {
             Toast.makeText(this, ex.message, Toast.LENGTH_SHORT).show()

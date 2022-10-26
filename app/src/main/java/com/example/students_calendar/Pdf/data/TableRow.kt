@@ -1,6 +1,8 @@
 package com.example.students_calendar.pdf.data
 
-class TableRow() {
+import com.example.students_calendar.pdf.data.TableCell
+
+class TableRow {
     val cells: MutableList<TableCell> = ArrayList()
     var dayIndex:Int = 0
 }

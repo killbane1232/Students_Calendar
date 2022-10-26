@@ -65,18 +65,18 @@ class RedactNoteDialog {
             beginDate = note.startDate!!
             endDate = note.endDate!!
             beginDateButton.visibility = View.VISIBLE
-            beginDateButton.setText(note.startDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+            beginDateButton.text = note.startDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
             endDateButton.visibility = View.VISIBLE
-            endDateButton.setText(note.endDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+            endDateButton.text = note.endDate?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         }
         if (note.startTime != null) {
             checkBoxTime.isChecked = true
             beginTime = note.startTime!!
             endTime = note.endTime!!
             beginTimeButton.visibility = View.VISIBLE
-            beginTimeButton.setText(note.startTime?.format(DateTimeFormatter.ofPattern("HH:mm")))
+            beginTimeButton.text = note.startTime?.format(DateTimeFormatter.ofPattern("HH:mm"))
             endTimeButton.visibility = View.VISIBLE
-            endTimeButton.setText(note.endTime?.format(DateTimeFormatter.ofPattern("HH:mm")))
+            endTimeButton.text = note.endTime?.format(DateTimeFormatter.ofPattern("HH:mm"))
         }
 
         if (note.isPeriodic && note.periodDays != null) {
